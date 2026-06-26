@@ -836,87 +836,89 @@ body {
 
   <div class="hr"></div>
 
-  <div class="lbl">Prepress Workflow Software <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--gray-4);">— select all that apply</span></div>
-  <p class="lbl-hint">Identifies integration requirements and potential workflow overlaps</p>
-  <div class="tog-row" id="prepress-grid">
-    <div class="t" data-val="prinergy"     onclick="togglePillArr(this,'prepressWorkflow')">Kodak Prinergy</div>
-    <div class="t" data-val="prinect"      onclick="togglePillArr(this,'prepressWorkflow')">Heidelberg Prinect</div>
-    <div class="t" data-val="apogee"       onclick="togglePillArr(this,'prepressWorkflow')">Agfa Apogee</div>
-    <div class="t" data-val="esko-ae"      onclick="togglePillArr(this,'prepressWorkflow')">Esko Automation Engine</div>
-    <div class="t" data-val="esko-dp"      onclick="togglePillArr(this,'prepressWorkflow')">Esko DeskPack</div>
-    <div class="t" data-val="artpro"       onclick="togglePillArr(this,'prepressWorkflow')">ArtPro+</div>
-    <div class="t" data-val="gmg-color"    onclick="togglePillArr(this,'prepressWorkflow')">GMG Color Server</div>
-    <div class="t" data-val="gmg-open"     onclick="togglePillArr(this,'prepressWorkflow')">GMG OpenColor</div>
-    <div class="t" data-val="gmg-proof"    onclick="togglePillArr(this,'prepressWorkflow')">GMG ColorProof</div>
-    <div class="t" data-val="none-prepress" onclick="togglePillArr(this,'prepressWorkflow')">None / Manual</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <label class="fl" style="white-space:nowrap;margin-bottom:0;">Other:</label>
-    <input class="fi" id="prepress-other" placeholder="e.g. Enfocus Switch, Dalim…" style="margin-bottom:0;flex:1;max-width:340px;" oninput="state.prepressOther=this.value">
-  </div>
-
-  <div class="hr"></div>
-
   <div class="lbl">Current Environment <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--gray-4);">— select all that apply per category</span></div>
   <p class="lbl-hint" style="margin-bottom:14px;">Identifies existing systems to position Flux and avoid overlap</p>
 
   <div class="env-rows">
     <div class="env-row">
       <div><div class="env-key">MIS<br><span class="env-sub">Management Information System</span></div></div>
-      <div class="tog-row" style="margin-bottom:0;">
-        <div class="t" data-val="efi-pace"   data-cat="MIS" onclick="toggleEnv(this)">EFI Pace</div>
-        <div class="t" data-val="printviz"   data-cat="MIS" onclick="toggleEnv(this)">PrintVis</div>
-        <div class="t" data-val="tharstern"  data-cat="MIS" onclick="toggleEnv(this)">Tharstern</div>
-        <div class="t" data-val="cerm"       data-cat="MIS" onclick="toggleEnv(this)">CERM</div>
-        <div class="t" data-val="no-mis"     data-cat="MIS" onclick="toggleEnv(this)">None</div>
+      <div>
+        <div class="tog-row" style="margin-bottom:8px;">
+          <div class="t" data-val="efi-pace"   data-cat="MIS" onclick="toggleEnv(this)">EFI Pace</div>
+          <div class="t" data-val="printviz"   data-cat="MIS" onclick="toggleEnv(this)">PrintVis</div>
+          <div class="t" data-val="tharstern"  data-cat="MIS" onclick="toggleEnv(this)">Tharstern</div>
+          <div class="t" data-val="cerm"       data-cat="MIS" onclick="toggleEnv(this)">CERM</div>
+          <div class="t" data-val="no-mis"     data-cat="MIS" onclick="toggleEnv(this)">None</div>
+        </div>
+        <div class="env-other"><label>Other:</label><input class="fi env-other-input" placeholder="Other MIS system…" style="margin-bottom:0;" oninput="state.envOther.MIS=this.value"></div>
       </div>
     </div>
     <div class="env-row">
       <div><div class="env-key">ERP<br><span class="env-sub">Enterprise Resource Planning</span></div></div>
-      <div class="tog-row" style="margin-bottom:0;">
-        <div class="t" data-val="sap"         data-cat="ERP" onclick="toggleEnv(this)">SAP</div>
-        <div class="t" data-val="netsuite"    data-cat="ERP" onclick="toggleEnv(this)">Oracle NetSuite</div>
-        <div class="t" data-val="ms-dynamics" data-cat="ERP" onclick="toggleEnv(this)">Microsoft Dynamics</div>
-        <div class="t" data-val="no-erp"      data-cat="ERP" onclick="toggleEnv(this)">None</div>
+      <div>
+        <div class="tog-row" style="margin-bottom:8px;">
+          <div class="t" data-val="sap"         data-cat="ERP" onclick="toggleEnv(this)">SAP</div>
+          <div class="t" data-val="netsuite"    data-cat="ERP" onclick="toggleEnv(this)">Oracle NetSuite</div>
+          <div class="t" data-val="ms-dynamics" data-cat="ERP" onclick="toggleEnv(this)">Microsoft Dynamics</div>
+          <div class="t" data-val="no-erp"      data-cat="ERP" onclick="toggleEnv(this)">None</div>
+        </div>
+        <div class="env-other"><label>Other:</label><input class="fi env-other-input" placeholder="Other ERP system…" style="margin-bottom:0;" oninput="state.envOther.ERP=this.value"></div>
       </div>
     </div>
     <div class="env-row">
       <div><div class="env-key">Workflow<br><span class="env-sub">Prepress &amp; Automation</span></div></div>
-      <div class="tog-row" style="margin-bottom:0;">
-        <div class="t" data-val="agfa-apogee"    data-cat="Workflow" onclick="toggleEnv(this)">Agfa Apogee</div>
-        <div class="t" data-val="esko-engine"    data-cat="Workflow" onclick="toggleEnv(this)">Esko Automation Engine</div>
-        <div class="t" data-val="kodak-prinergy" data-cat="Workflow" onclick="toggleEnv(this)">Kodak Prinergy</div>
-        <div class="t" data-val="hd-prinect"     data-cat="Workflow" onclick="toggleEnv(this)">Heidelberg Prinect</div>
-        <div class="t" data-val="flux-existing"  data-cat="Workflow" onclick="toggleEnv(this)">AccurioPro Flux</div>
-        <div class="t" data-val="no-workflow"    data-cat="Workflow" onclick="toggleEnv(this)">None / Manual</div>
+      <div>
+        <div class="tog-row" style="margin-bottom:8px;">
+          <div class="t" data-val="agfa-apogee"    data-cat="Workflow" onclick="toggleEnv(this)">Agfa Apogee</div>
+          <div class="t" data-val="esko-engine"    data-cat="Workflow" onclick="toggleEnv(this)">Esko Automation Engine</div>
+          <div class="t" data-val="esko-dp"        data-cat="Workflow" onclick="toggleEnv(this)">Esko DeskPack</div>
+          <div class="t" data-val="kodak-prinergy" data-cat="Workflow" onclick="toggleEnv(this)">Kodak Prinergy</div>
+          <div class="t" data-val="hd-prinect"     data-cat="Workflow" onclick="toggleEnv(this)">Heidelberg Prinect</div>
+          <div class="t" data-val="artpro"         data-cat="Workflow" onclick="toggleEnv(this)">ArtPro+</div>
+          <div class="t" data-val="gmg-color"      data-cat="Workflow" onclick="toggleEnv(this)">GMG Color Server</div>
+          <div class="t" data-val="gmg-open"       data-cat="Workflow" onclick="toggleEnv(this)">GMG OpenColor</div>
+          <div class="t" data-val="gmg-proof"      data-cat="Workflow" onclick="toggleEnv(this)">GMG ColorProof</div>
+          <div class="t" data-val="flux-existing"  data-cat="Workflow" onclick="toggleEnv(this)">AccurioPro Flux</div>
+          <div class="t" data-val="no-workflow"    data-cat="Workflow" onclick="toggleEnv(this)">None / Manual</div>
+        </div>
+        <div class="env-other"><label>Other:</label><input class="fi env-other-input" placeholder="Other workflow software…" style="margin-bottom:0;" oninput="state.envOther.Workflow=this.value"></div>
       </div>
     </div>
     <div class="env-row">
       <div><div class="env-key">Color Management</div></div>
-      <div class="tog-row" style="margin-bottom:0;">
-        <div class="t" data-val="gmg-env"       data-cat="ColorMgmt" onclick="toggleEnv(this)">GMG</div>
-        <div class="t" data-val="apcm-existing" data-cat="ColorMgmt" onclick="toggleEnv(this)">AccurioPro Color Manager</div>
-        <div class="t" data-val="no-colormgmt"  data-cat="ColorMgmt" onclick="toggleEnv(this)">None</div>
+      <div>
+        <div class="tog-row" style="margin-bottom:8px;">
+          <div class="t" data-val="gmg-env"       data-cat="ColorMgmt" onclick="toggleEnv(this)">GMG</div>
+          <div class="t" data-val="apcm-existing" data-cat="ColorMgmt" onclick="toggleEnv(this)">AccurioPro Color Manager</div>
+          <div class="t" data-val="no-colormgmt"  data-cat="ColorMgmt" onclick="toggleEnv(this)">None</div>
+        </div>
+        <div class="env-other"><label>Other:</label><input class="fi env-other-input" placeholder="Other color management tool…" style="margin-bottom:0;" oninput="state.envOther.ColorMgmt=this.value"></div>
       </div>
     </div>
     <div class="env-row">
       <div><div class="env-key">Web-to-Print<br><span class="env-sub">Online submission &amp; approval</span></div></div>
-      <div class="tog-row" style="margin-bottom:0;">
-        <div class="t" data-val="webcenter"  data-cat="W2P" onclick="toggleEnv(this)">WebCenter</div>
-        <div class="t" data-val="printiq"    data-cat="W2P" onclick="toggleEnv(this)">PrintIQ</div>
-        <div class="t" data-val="custom-w2p" data-cat="W2P" onclick="toggleEnv(this)">Custom / In-house W2P</div>
-        <div class="t" data-val="no-w2p"     data-cat="W2P" onclick="toggleEnv(this)">None</div>
+      <div>
+        <div class="tog-row" style="margin-bottom:8px;">
+          <div class="t" data-val="webcenter"  data-cat="W2P" onclick="toggleEnv(this)">WebCenter</div>
+          <div class="t" data-val="printiq"    data-cat="W2P" onclick="toggleEnv(this)">PrintIQ</div>
+          <div class="t" data-val="custom-w2p" data-cat="W2P" onclick="toggleEnv(this)">Custom / In-house W2P</div>
+          <div class="t" data-val="no-w2p"     data-cat="W2P" onclick="toggleEnv(this)">None</div>
+        </div>
+        <div class="env-other"><label>Other:</label><input class="fi env-other-input" placeholder="Other W2P portal…" style="margin-bottom:0;" oninput="state.envOther.W2P=this.value"></div>
       </div>
     </div>
     <div class="env-row" style="border-bottom:none;">
       <div><div class="env-key">Finishing<br><span class="env-sub">Post-print equipment</span></div></div>
-      <div class="tog-row" style="margin-bottom:0;">
-        <div class="t" data-val="saddle-stitch" data-cat="Finishing" onclick="toggleEnv(this)">Saddle Stitcher</div>
-        <div class="t" data-val="perfect-bind"  data-cat="Finishing" onclick="toggleEnv(this)">Perfect Binder</div>
-        <div class="t" data-val="cutter"        data-cat="Finishing" onclick="toggleEnv(this)">Cutter / Guillotine</div>
-        <div class="t" data-val="laminator"     data-cat="Finishing" onclick="toggleEnv(this)">Laminator</div>
-        <div class="t" data-val="folder"        data-cat="Finishing" onclick="toggleEnv(this)">Folder / Inserter</div>
-        <div class="t" data-val="no-finishing"  data-cat="Finishing" onclick="toggleEnv(this)">None</div>
+      <div>
+        <div class="tog-row" style="margin-bottom:8px;">
+          <div class="t" data-val="saddle-stitch" data-cat="Finishing" onclick="toggleEnv(this)">Saddle Stitcher</div>
+          <div class="t" data-val="perfect-bind"  data-cat="Finishing" onclick="toggleEnv(this)">Perfect Binder</div>
+          <div class="t" data-val="cutter"        data-cat="Finishing" onclick="toggleEnv(this)">Cutter / Guillotine</div>
+          <div class="t" data-val="laminator"     data-cat="Finishing" onclick="toggleEnv(this)">Laminator</div>
+          <div class="t" data-val="folder"        data-cat="Finishing" onclick="toggleEnv(this)">Folder / Inserter</div>
+          <div class="t" data-val="no-finishing"  data-cat="Finishing" onclick="toggleEnv(this)">None</div>
+        </div>
+        <div class="env-other"><label>Other:</label><input class="fi env-other-input" placeholder="Other finishing equipment…" style="margin-bottom:0;" oninput="state.envOther.Finishing=this.value"></div>
       </div>
     </div>
   </div>
