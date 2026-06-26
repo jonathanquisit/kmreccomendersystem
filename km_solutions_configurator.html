@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KM Production Print — Solutions Configurator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Tokens ─────────────────────────── */
+:root {
+  --black:    #111111;
+  --gray-1:   #444444;
+  --gray-2:   #666666;
+  --gray-3:   #888888;
+  --gray-4:   #BBBBBB;
+  --gray-5:   #E5E5E5;
+  --gray-6:   #F5F5F5;
+  --white:    #FFFFFF;
+  --blue:     #0A7EA4;
+  --blue-lt:  #E8F4F9;
+  --navy:     #0D1F3C;
+  --green:    #1A7F5A;
+  --amber:    #B45309;
+  --purple:   #5B21B6;
+  --slate:    #4B5563;
+  --red:      #C0392B;
+}
+
+/* ── Reset ──────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gray-1);
+  background: var(--white);
+}
+
+/* ── Header ─────────────────────────── */
+.km-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-5);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.km-logo-img { height: 34px; width: auto; display: block; }
+
+/* ── Step nav ────────────────────────── */
+.stepnav {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-5);
+}
+.sn-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.sn-item {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-4);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  gap: 6px;
+}
+.sn-item.active { color: var(--black); border-bottom-color: var(--blue); font-weight: 600; }
+.sn-item.done   { color: var(--gray-3); }
+.sn-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1.5px solid var(--gray-5);
+  color: var(--gray-4);
+  flex-shrink: 0;
+}
+.sn-item.active .sn-num { border-color: var(--blue); background: var(--blue); color: var(--white); }
+.sn-item.done .sn-num {
+  border-color: var(--gray-4); background: var(--gray-4); color: var(--white);
+  font-size: 0;
+  position: relative;
+}
+.sn-item.done .sn-num::after {
+  content: '';
+  position: absolute;
+  width: 7px; height: 4px;
+  border-left: 1.5px solid white;
+  border-bottom: 1.5px solid white;
+  transform: rotate(-45deg) translateY(-1px);
+  display: block;
+}
+.sn-sep { color: var(--gray-5); font-size: 14px; padding: 0 8px; }
+
+/* ── Page body ───────────────────────── */
+.main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 52px 32px 100px;
+}
+
+/* ── Screen transitions ──────────────── */
+.screen { display: none; }
+.screen.active { display: block; animation: rise .2s ease; }
+@keyframes rise {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Screen headings ─────────────────── */
+.pg-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: -0.6px;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.pg-desc {
+  font-size: 14px;
+  color: var(--gray-2);
+  margin-bottom: 40px;
+  max-width: 520px;
+}
+
+/* ── Section labels ──────────────────── */
+.lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-3);
+  margin-bottom: 8px;
+}
+.lbl-hint {
+  font-size: 12px;
+  color: var(--gray-4);
+  margin-bottom: 10px;
+  margin-top: -4px;
+}
+
+/* ── Horizontal rule ─────────────────── */
+.hr { height: 1px; background: var(--gray-5); margin: 36px 0; }
+
+/* ── Form fields ─────────────────────── */
+.fl {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--gray-3);
+  margin-bottom: 5px;
+}
+.fi {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--gray-5);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--black);
+  background: var(--white);
+  outline: none;
+  transition: border-color .12s;
+  margin-bottom: 14px;
+}
+.fi::placeholder { color: var(--gray-4); }
+.fi:focus { border-color: var(--blue); }
+
+/* ── Customer type: bordered grid ────── */
+.seg-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--gray-5);
+  border: 1px solid var(--gray-5);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.seg-cell {
+  background: var(--white);
+  padding: 16px 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  transition: background .1s;
+}
+.seg-cell:hover   { background: var(--gray-6); }
+.seg-cell.selected { background: var(--blue-lt); }
+.seg-radio {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gray-4);
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all .12s;
+}
+.seg-cell.selected .seg-radio {
+  border-color: var(--blue);
+  background: var(--blue);
+  box-shadow: inset 0 0 0 3px var(--blue-lt);
+}
+.seg-name { font-size: 13px; font-weight: 600; color: var(--black); margin-bottom: 2px; }
+.seg-desc { font-size: 11px; color: var(--gray-2); line-height: 1.4; }
+.seg-tag  { font-size: 10px; color: var(--blue); margin-top: 4px; font-weight: 500; }
+
+/* ── Segmented size control ──────────── */
+.size-ctl {
+  display: inline-flex;
+  border: 1px solid var(--gray-5);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+.sz {
+  padding: 8px 28px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-2);
+  cursor: pointer;
+  background: var(--white);
+  border-right: 1px solid var(--gray-5);
+  transition: all .1s;
+  user-select: none;
+  text-align: center;
+}
+.sz small { display:block; font-size:10px; font-weight:400; opacity:.7; }
+.sz:last-child { border-right: none; }
+.sz:hover { background: var(--gray-6); color: var(--black); }
+.sz.selected { background: var(--navy); color: var(--white); border-right-color: var(--navy); }
+
+/* ── Toggle tags (multi-select) ──────── */
+.tog-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.t {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--gray-5);
+  border-radius: 3px;
+  cursor: pointer;
+  background: var(--white);
+  color: var(--gray-2);
+  user-select: none;
+  transition: all .1s;
+}
+.t:hover { border-color: var(--gray-4); color: var(--black); }
+.t.selected { background: var(--black); border-color: var(--black); color: var(--white); }
+
+/* ── Environment — flat labeled rows ─── */
+.env-rows { border-top: 1px solid var(--gray-5); }
+.env-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--gray-5);
+  align-items: start;
+}
+.env-key { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-3); padding-top: 4px; }
+.env-sub { font-size: 10px; color: var(--gray-4); margin-top: 2px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+/* ── Check grid (machines + challenges) ─ */
+.chk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--gray-5);
+  border: 1px solid var(--gray-5);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.cc {
+  background: var(--white);
+  padding: 11px 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  transition: background .1s;
+}
+.cc:hover  { background: var(--gray-6); }
+.cc.selected { background: var(--blue-lt); }
+.cb {
+  width: 15px; height: 15px;
+  border: 1.5px solid var(--gray-4);
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .1s;
+}
+.cc.selected .cb {
+  background: var(--black);
+  border-color: var(--black);
+}
+.cc.selected .cb::after {
+  content: '';
+  display: block;
+  width: 5px; height: 3px;
+  border-left: 1.5px solid white;
+  border-bottom: 1.5px solid white;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.cc-label { font-size: 12px; font-weight: 600; color: var(--black); line-height: 1.3; }
+.cc-spec  { font-size: 10px; color: var(--gray-3); margin-top: 2px; }
+
+/* ── Navigation ──────────────────────── */
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 44px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-5);
+}
+.btn {
+  padding: 9px 20px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+  transition: all .12s;
+}
+.btn-primary { background: var(--navy); color: var(--white); border-color: var(--navy); }
+.btn-primary:hover { background: #1a3558; }
+.btn-ghost   { background: transparent; color: var(--gray-2); border-color: var(--gray-5); }
+.btn-ghost:hover { border-color: var(--gray-4); color: var(--black); }
+.btn-outline { background: transparent; color: var(--navy); border-color: var(--navy); }
+.btn-outline:hover { background: var(--navy); color: var(--white); }
+
+/* ── Validation hint ─────────────────── */
+.hint { display: none; align-items: center; gap: 6px; font-size: 12px; color: var(--red); margin-top: 10px; }
+.hint.show { display: flex; }
+
+/* ═══════════════════════════════════════
+   RESULTS — clean document style
+═══════════════════════════════════════ */
+
+/* Letterhead */
+.doc-hdr {
+  background: var(--navy);
+  border-radius: 4px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+.doc-hdr-body { flex: 1; }
+.doc-eyebrow {
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: rgba(255,255,255,.35); margin-bottom: 6px;
+}
+.doc-name {
+  font-size: 22px; font-weight: 700;
+  color: var(--white); letter-spacing: -.3px; margin-bottom: 3px;
+}
+.doc-date { font-size: 12px; color: rgba(255,255,255,.4); margin-bottom: 10px; }
+.doc-meta { font-size: 12px; color: rgba(255,255,255,.55); margin-bottom: 2px; }
+.doc-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+.doc-chip {
+  font-size: 10px; font-weight: 500;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 3px;
+  padding: 3px 9px;
+  color: rgba(255,255,255,.7);
+}
+
+/* Document section */
+.dsect { margin-bottom: 32px; }
+.dsect-title {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--blue);
+  border-bottom: 1px solid var(--gray-5);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+
+/* Environment table */
+.env-tbl { width: 100%; border-collapse: collapse; }
+.env-tbl tr td {
+  padding: 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--gray-6);
+  vertical-align: top;
+}
+.env-tbl tr:last-child td { border-bottom: none; }
+.env-tbl td:first-child {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .6px;
+  color: var(--gray-3);
+  width: 140px;
+  padding-top: 7px;
+}
+.env-tbl td:last-child { color: var(--gray-1); }
+
+/* Challenges */
+.chall-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chall-item {
+  font-size: 11px; font-weight: 500;
+  background: #FEF3C7;
+  color: #78350F;
+  border-radius: 3px;
+  padding: 3px 9px;
+}
+
+/* Product recommendation blocks */
+.rec-block {
+  border-left: 3px solid var(--blue);
+  padding: 14px 18px;
+  background: var(--gray-6);
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 10px;
+}
+.rec-block.color { border-left-color: var(--green); }
+.rec-block-hd {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.rec-name { font-size: 14px; font-weight: 700; color: var(--black); }
+.rec-type { font-size: 11px; color: var(--gray-3); }
+.rec-feats {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 20px;
+}
+.rec-feats li {
+  font-size: 12px; color: var(--gray-2);
+  padding-left: 12px; position: relative; line-height: 1.4;
+}
+.rec-feats li::before {
+  content: '–';
+  position: absolute; left: 0;
+  color: var(--gray-4);
+}
+
+/* CloudEye */
+.cloudeye {
+  display: flex; gap: 12px; align-items: flex-start;
+  border: 1px solid var(--gray-5);
+  border-radius: 4px;
+  padding: 13px 15px;
+  margin-bottom: 10px;
+}
+.cloudeye-ico {
+  width: 28px; height: 28px;
+  background: var(--navy);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--white);
+}
+.cloudeye-ico svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; }
+.cloudeye-name { font-size: 13px; font-weight: 700; color: var(--black); margin-bottom: 3px; }
+.cloudeye-desc { font-size: 12px; color: var(--gray-2); line-height: 1.5; }
+
+/* Machine items */
+.mach-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  border: 1px solid var(--gray-5);
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 8px;
+}
+.mach-badge {
+  background: var(--navy); color: var(--white);
+  border-radius: 3px; padding: 6px 10px;
+  font-size: 9px; font-weight: 700;
+  text-align: center; flex-shrink: 0;
+  min-width: 60px; line-height: 1.5;
+  letter-spacing: .3px;
+}
+.mach-info { flex: 1; min-width: 0; }
+.mach-name { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 3px; }
+.mach-desc { font-size: 12px; color: var(--gray-2); line-height: 1.45; margin-bottom: 7px; }
+.mach-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 7px; }
+.mach-tag {
+  font-size: 10px; font-weight: 500;
+  background: var(--gray-6); border: 1px solid var(--gray-5);
+  border-radius: 3px; padding: 2px 7px;
+  color: var(--gray-2);
+}
+.mach-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 500;
+  color: var(--blue); text-decoration: none;
+}
+.mach-link:hover { text-decoration: underline; }
+.mach-qr { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.qr-cap { font-size: 9px; color: var(--gray-4); text-align: center; line-height: 1.3; }
+
+/* Workflow */
+.wf-scroll { overflow-x: auto; padding-bottom: 4px; }
+.wf-flow { display: flex; align-items: flex-start; min-width: max-content; }
+.wf-step { display: flex; flex-direction: column; align-items: center; }
+.wf-box {
+  background: var(--navy); color: var(--white);
+  border-radius: 4px; padding: 9px 11px;
+  text-align: center; font-size: 10px; font-weight: 600;
+  min-width: 88px; line-height: 1.4;
+}
+.wf-box.blue   { background: var(--blue); }
+.wf-box.green  { background: var(--green); }
+.wf-box.amber  { background: var(--amber); }
+.wf-box.purple { background: var(--purple); }
+.wf-box.slate  { background: var(--slate); }
+.wf-ptag {
+  font-size: 8px; background: rgba(255,255,255,.15);
+  border-radius: 2px; padding: 1px 4px;
+  margin-top: 3px; display: inline-block;
+}
+.wf-sub { font-size: 9px; color: var(--gray-3); text-align: center; margin-top: 4px; max-width: 88px; }
+.wf-arr { display: flex; align-items: center; padding: 0 3px; padding-bottom: 22px; color: var(--gray-5); font-size: 14px; flex-shrink: 0; }
+.wf-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; }
+.wf-leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray-2); }
+.wf-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* Selling points */
+.sp-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.sp-list li { font-size: 13px; color: var(--gray-1); padding-left: 16px; position: relative; line-height: 1.5; }
+.sp-list li::before {
+  content: ''; position: absolute; left: 0; top: 6px;
+  width: 7px; height: 4px;
+  border-left: 1.5px solid var(--green);
+  border-bottom: 1.5px solid var(--green);
+  transform: rotate(-45deg);
+}
+
+/* Growth path */
+.growth-box {
+  background: var(--gray-6); border: 1px solid var(--gray-5);
+  border-radius: 4px; padding: 18px 20px;
+}
+.growth-nodes { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.gn {
+  font-size: 11px; font-weight: 500;
+  border: 1px solid var(--gray-5);
+  border-radius: 3px; padding: 4px 10px;
+  color: var(--gray-3);
+}
+.gn.current { background: var(--navy); border-color: var(--navy); color: var(--white); font-weight: 600; }
+.g-arr { color: var(--gray-5); font-size: 12px; }
+.growth-note { font-size: 12px; color: var(--gray-2); line-height: 1.5; }
+
+/* Action row */
+.action-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+
+/* ── Intro page ──────────────────────── */
+.intro-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 0 60px;
+  text-align: center;
+}
+.intro-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: -.5px;
+  line-height: 1.25;
+  margin-bottom: 28px;
+}
+.intro-banner {
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.intro-banner img { width: 100%; height: auto; display: block; }
+.intro-desc {
+  font-size: 14px;
+  color: var(--gray-2);
+  line-height: 1.75;
+  margin: 0 auto 36px;
+  max-width: 520px;
+  text-align: left;
+}
+.intro-btn {
+  display: inline-block;
+  padding: 12px 44px;
+  background: var(--navy);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: .1px;
+  transition: background .12s;
+}
+.intro-btn:hover { background: #1a3558; }
+
+/* ── Footer ──────────────────────────── */
+.site-footer {
+  border-top: 1px solid var(--gray-5);
+  padding: 14px 48px;
+  background: var(--white);
+}
+.footer-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.footer-copy { font-size: 11px; color: var(--gray-4); }
+.footer-link {
+  font-size: 11px;
+  color: var(--gray-4);
+  text-decoration: none;
+}
+.footer-link:hover { color: var(--gray-2); text-decoration: underline; }
+
+/* ── Print ───────────────────────────── */
+@media print {
+  body { background: white; }
+  .km-header, .stepnav, .nav-row, .action-row, .site-footer, #screen-0 { display: none !important; }
+  .main { padding: 0; max-width: 100%; }
+  .doc-hdr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wf-box   { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page-break { page-break-before: always; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ───────────────────────────────────── -->
+<header class="km-header">
+  <img src="images/identity01g.svg" alt="Konica Minolta" class="km-logo-img">
+</header>
+
+<!-- ── Step nav (hidden on intro) ───────────────── -->
+<nav class="stepnav" id="stepnav" style="display:none;">
+  <div class="sn-inner">
+    <div class="sn-item" id="si-1"><div class="sn-num">1</div>Customer Type</div>
+    <div class="sn-sep">›</div>
+    <div class="sn-item" id="si-2"><div class="sn-num">2</div>Production Setup</div>
+    <div class="sn-sep">›</div>
+    <div class="sn-item" id="si-3"><div class="sn-num">3</div>Challenges</div>
+    <div class="sn-sep">›</div>
+    <div class="sn-item" id="si-4"><div class="sn-num">4</div>Recommendation</div>
+  </div>
+</nav>
+
+<main class="main" id="main-content">
+
+<!-- ══════════════════════════════════════
+     SCREEN 0 — Intro
+══════════════════════════════════════ -->
+<div class="screen active" id="screen-0">
+  <div class="intro-wrap">
+    <h1 class="intro-title">Welcome to Konica Minolta<br>Software Recommender System</h1>
+    <div class="intro-banner">
+      <img src="images/banner.jpeg" alt="Konica Minolta Production Print">
+    </div>
+    <p class="intro-desc">
+      This tool guides your sales conversation by capturing customer details, current environment, and key challenges — then generates a tailored recommendation for AccurioPro Flux, AccurioPro Color Manager, and the right KM production press. Complete in under 5 minutes and export a professional PDF for your customer.
+    </p>
+    <button class="intro-btn" onclick="goTo(1)">Let's Begin</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1
+══════════════════════════════════════ -->
+<div class="screen" id="screen-1">
+  <h1 class="pg-title">Who is your customer?</h1>
+  <p class="pg-desc">Enter contact details and select the customer segment — this determines the recommended solution stack and workflow tier.</p>
+
+  <div style="max-width:540px;">
+    <label class="fl">Customer / Company Name</label>
+    <input class="fi" id="customer-name" placeholder="e.g. Printco Asia, ABC University">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div>
+        <label class="fl">Customer Email</label>
+        <input class="fi" id="customer-email" placeholder="name@company.com" style="margin-bottom:0;">
+      </div>
+      <div>
+        <label class="fl">Sales Representative</label>
+        <input class="fi" id="sales-rep" placeholder="Your name" style="margin-bottom:0;">
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="lbl">Customer Segment</div>
+  <p class="lbl-hint">Select the type that best describes this customer's print operation</p>
+
+  <div class="seg-grid" id="cust-type-grid">
+    <div class="seg-cell" data-val="PFP" onclick="selectOne(this,'cust-type')">
+      <div class="seg-radio"></div>
+      <div>
+        <div class="seg-name">Print for Pay (PFP)</div>
+        <div class="seg-desc">Photo labs, quick print shops, kiosks, PFP bureaus</div>
+        <div class="seg-tag">Photo · Kiosk · Quick Print</div>
+      </div>
+    </div>
+    <div class="seg-cell" data-val="CRD" onclick="selectOne(this,'cust-type')">
+      <div class="seg-radio"></div>
+      <div>
+        <div class="seg-name">Corporate Reprographics (CRD)</div>
+        <div class="seg-desc">In-house print department serving internal requestors</div>
+        <div class="seg-tag">In-plant · Corporate</div>
+      </div>
+    </div>
+    <div class="seg-cell" data-val="Commercial" onclick="selectOne(this,'cust-type')">
+      <div class="seg-radio"></div>
+      <div>
+        <div class="seg-name">Commercial Printer</div>
+        <div class="seg-desc">B2B print shop serving agencies, brands and enterprises</div>
+        <div class="seg-tag">Commercial · B2B</div>
+      </div>
+    </div>
+    <div class="seg-cell" data-val="Schools" onclick="selectOne(this,'cust-type')">
+      <div class="seg-radio"></div>
+      <div>
+        <div class="seg-name">Schools &amp; Universities</div>
+        <div class="seg-desc">Campus print centers, academic and student services</div>
+        <div class="seg-tag">Education · Campus</div>
+      </div>
+    </div>
+    <div class="seg-cell" data-val="Government" onclick="selectOne(this,'cust-type')">
+      <div class="seg-radio"></div>
+      <div>
+        <div class="seg-name">Government Institution</div>
+        <div class="seg-desc">Public sector in-plant with compliance constraints</div>
+        <div class="seg-tag">Public Sector · In-plant</div>
+      </div>
+    </div>
+    <div class="seg-cell" data-val="Offset" onclick="selectOne(this,'cust-type')">
+      <div class="seg-radio"></div>
+      <div>
+        <div class="seg-name">Commercial Offset Printer</div>
+        <div class="seg-desc">Offset printer transitioning to digital production</div>
+        <div class="seg-tag">Offset · Digital Transition</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint" id="hint-1">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Select a customer type to continue.
+  </p>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn btn-primary" onclick="goTo(2)">Next: Production Setup →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2
+══════════════════════════════════════ -->
+<div class="screen" id="screen-2">
+  <h1 class="pg-title">Current production setup</h1>
+  <p class="pg-desc">Document the customer's existing environment. Select all that apply — this shapes the recommended entry point and integration approach.</p>
+
+  <div class="lbl">Operation Size</div>
+  <div class="size-ctl" style="margin-top:8px;">
+    <div class="sz" data-val="Small"  onclick="selectSize(this)">Small<small>1–5 staff</small></div>
+    <div class="sz" data-val="Medium" onclick="selectSize(this)">Medium<small>6–20 staff</small></div>
+    <div class="sz" data-val="Big"    onclick="selectSize(this)">Large<small>20+ staff</small></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="lbl">Current Machines / Resources <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--gray-4);">— select all that apply</span></div>
+  <div class="tog-row" id="machines-grid" style="margin-top:8px;">
+    <div class="t" data-val="startup"         onclick="togglePill(this)">No machines — Startup</div>
+    <div class="t" data-val="no-offset"        onclick="togglePill(this)">No offset machines</div>
+    <div class="t" data-val="offset"           onclick="togglePill(this)">Offset Press</div>
+    <div class="t" data-val="digital-press"    onclick="togglePill(this)">Digital Press (existing)</div>
+    <div class="t" data-val="inkjet-existing"  onclick="togglePill(this)">Inkjet Printer</div>
+    <div class="t" data-val="mfp"              onclick="togglePill(this)">MFP / Copier</div>
+    <div class="t" data-val="wide-format"      onclick="togglePill(this)">Wide Format Printer</div>
+    <div class="t" data-val="rip"              onclick="togglePill(this)">RIP / DFE Software</div>
+    <div class="t" data-val="finishing"        onclick="togglePill(this)">Finishing / Bindery</div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="lbl">Design &amp; Creative Software <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--gray-4);">— select all that apply</span></div>
+  <p class="lbl-hint">Identifies file format compatibility and prepress complexity</p>
+  <div class="tog-row" id="design-software-grid">
+    <div class="t" data-val="indesign"    onclick="togglePillArr(this,'designSoftware')">Adobe InDesign</div>
+    <div class="t" data-val="photoshop"   onclick="togglePillArr(this,'designSoftware')">Adobe Photoshop</div>
+    <div class="t" data-val="illustrator" onclick="togglePillArr(this,'designSoftware')">Adobe Illustrator</div>
+    <div class="t" data-val="acrobat"     onclick="togglePillArr(this,'designSoftware')">Adobe Acrobat</div>
+    <div class="t" data-val="coreldraw"   onclick="togglePillArr(this,'designSoftware')">CorelDRAW</div>
+    <div class="t" data-val="msword"      onclick="togglePillArr(this,'designSoftware')">Microsoft Word</div>
+    <div class="t" data-val="msexcel"     onclick="togglePillArr(this,'designSoftware')">Microsoft Excel</div>
+    <div class="t" data-val="msppt"       onclick="togglePillArr(this,'designSoftware')">Microsoft PowerPoint</div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="lbl">Prepress Workflow Software <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--gray-4);">— select all that apply</span></div>
+  <p class="lbl-hint">Identifies integration requirements and potential workflow overlaps</p>
+  <div class="tog-row" id="prepress-grid">
+    <div class="t" data-val="prinergy"     onclick="togglePillArr(this,'prepressWorkflow')">Kodak Prinergy</div>
+    <div class="t" data-val="prinect"      onclick="togglePillArr(this,'prepressWorkflow')">Heidelberg Prinect</div>
+    <div class="t" data-val="apogee"       onclick="togglePillArr(this,'prepressWorkflow')">Agfa Apogee</div>
+    <div class="t" data-val="esko-ae"      onclick="togglePillArr(this,'prepressWorkflow')">Esko Automation Engine</div>
+    <div class="t" data-val="esko-dp"      onclick="togglePillArr(this,'prepressWorkflow')">Esko DeskPack</div>
+    <div class="t" data-val="artpro"       onclick="togglePillArr(this,'prepressWorkflow')">ArtPro+</div>
+    <div class="t" data-val="gmg-color"    onclick="togglePillArr(this,'prepressWorkflow')">GMG Color Server</div>
+    <div class="t" data-val="gmg-open"     onclick="togglePillArr(this,'prepressWorkflow')">GMG OpenColor</div>
+    <div class="t" data-val="gmg-proof"    onclick="togglePillArr(this,'prepressWorkflow')">GMG ColorProof</div>
+    <div class="t" data-val="none-prepress" onclick="togglePillArr(this,'prepressWorkflow')">None / Manual</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <label class="fl" style="white-space:nowrap;margin-bottom:0;">Other:</label>
+    <input class="fi" id="prepress-other" placeholder="e.g. Enfocus Switch, Dalim…" style="margin-bottom:0;flex:1;max-width:340px;" oninput="state.prepressOther=this.value">
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="lbl">Current Environment <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--gray-4);">— select all that apply per category</span></div>
+  <p class="lbl-hint" style="margin-bottom:14px;">Identifies existing systems to position Flux and avoid overlap</p>
+
+  <div class="env-rows">
+    <div class="env-row">
+      <div><div class="env-key">MIS<br><span class="env-sub">Management Information System</span></div></div>
+      <div class="tog-row" style="margin-bottom:0;">
+        <div class="t" data-val="efi-pace"   data-cat="MIS" onclick="toggleEnv(this)">EFI Pace</div>
+        <div class="t" data-val="printviz"   data-cat="MIS" onclick="toggleEnv(this)">PrintVis</div>
+        <div class="t" data-val="tharstern"  data-cat="MIS" onclick="toggleEnv(this)">Tharstern</div>
+        <div class="t" data-val="cerm"       data-cat="MIS" onclick="toggleEnv(this)">CERM</div>
+        <div class="t" data-val="no-mis"     data-cat="MIS" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+    <div class="env-row">
+      <div><div class="env-key">ERP<br><span class="env-sub">Enterprise Resource Planning</span></div></div>
+      <div class="tog-row" style="margin-bottom:0;">
+        <div class="t" data-val="sap"         data-cat="ERP" onclick="toggleEnv(this)">SAP</div>
+        <div class="t" data-val="netsuite"    data-cat="ERP" onclick="toggleEnv(this)">Oracle NetSuite</div>
+        <div class="t" data-val="ms-dynamics" data-cat="ERP" onclick="toggleEnv(this)">Microsoft Dynamics</div>
+        <div class="t" data-val="no-erp"      data-cat="ERP" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+    <div class="env-row">
+      <div><div class="env-key">Workflow<br><span class="env-sub">Prepress &amp; Automation</span></div></div>
+      <div class="tog-row" style="margin-bottom:0;">
+        <div class="t" data-val="agfa-apogee"    data-cat="Workflow" onclick="toggleEnv(this)">Agfa Apogee</div>
+        <div class="t" data-val="esko-engine"    data-cat="Workflow" onclick="toggleEnv(this)">Esko Automation Engine</div>
+        <div class="t" data-val="kodak-prinergy" data-cat="Workflow" onclick="toggleEnv(this)">Kodak Prinergy</div>
+        <div class="t" data-val="hd-prinect"     data-cat="Workflow" onclick="toggleEnv(this)">Heidelberg Prinect</div>
+        <div class="t" data-val="flux-existing"  data-cat="Workflow" onclick="toggleEnv(this)">AccurioPro Flux</div>
+        <div class="t" data-val="no-workflow"    data-cat="Workflow" onclick="toggleEnv(this)">None / Manual</div>
+      </div>
+    </div>
+    <div class="env-row">
+      <div><div class="env-key">Color Management</div></div>
+      <div class="tog-row" style="margin-bottom:0;">
+        <div class="t" data-val="gmg-env"       data-cat="ColorMgmt" onclick="toggleEnv(this)">GMG</div>
+        <div class="t" data-val="apcm-existing" data-cat="ColorMgmt" onclick="toggleEnv(this)">AccurioPro Color Manager</div>
+        <div class="t" data-val="no-colormgmt"  data-cat="ColorMgmt" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+    <div class="env-row">
+      <div><div class="env-key">Web-to-Print<br><span class="env-sub">Online submission &amp; approval</span></div></div>
+      <div class="tog-row" style="margin-bottom:0;">
+        <div class="t" data-val="webcenter"  data-cat="W2P" onclick="toggleEnv(this)">WebCenter</div>
+        <div class="t" data-val="printiq"    data-cat="W2P" onclick="toggleEnv(this)">PrintIQ</div>
+        <div class="t" data-val="custom-w2p" data-cat="W2P" onclick="toggleEnv(this)">Custom / In-house W2P</div>
+        <div class="t" data-val="no-w2p"     data-cat="W2P" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+    <div class="env-row" style="border-bottom:none;">
+      <div><div class="env-key">Finishing<br><span class="env-sub">Post-print equipment</span></div></div>
+      <div class="tog-row" style="margin-bottom:0;">
+        <div class="t" data-val="saddle-stitch" data-cat="Finishing" onclick="toggleEnv(this)">Saddle Stitcher</div>
+        <div class="t" data-val="perfect-bind"  data-cat="Finishing" onclick="toggleEnv(this)">Perfect Binder</div>
+        <div class="t" data-val="cutter"        data-cat="Finishing" onclick="toggleEnv(this)">Cutter / Guillotine</div>
+        <div class="t" data-val="laminator"     data-cat="Finishing" onclick="toggleEnv(this)">Laminator</div>
+        <div class="t" data-val="folder"        data-cat="Finishing" onclick="toggleEnv(this)">Folder / Inserter</div>
+        <div class="t" data-val="no-finishing"  data-cat="Finishing" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="lbl">Interested KM AccurioPress Machines <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--gray-4);">— select all under consideration</span></div>
+  <div class="chk-grid" id="km-machines-grid" style="margin-top:10px;">
+    <div class="cc multi" data-val="C5080"   onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C5080 / C5070</div><div class="cc-spec">80/70 ppm · SRA3 · IC-613</div></div></div>
+    <div class="cc multi" data-val="C5065"   onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPrint C5065</div><div class="cc-spec">65 ppm · Compact · IC-613</div></div></div>
+    <div class="cc multi" data-val="C14010"  onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C14010 / C12010</div><div class="cc-spec">140/120 ppm · IC-614</div></div></div>
+    <div class="cc multi" data-val="C14010S" onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C14010S / C12010S</div><div class="cc-spec">140/120 ppm · Super · IC-614</div></div></div>
+    <div class="cc multi" data-val="C7100"   onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C7100 / C7090</div><div class="cc-spec">100/90 ppm · Compact · IC-609</div></div></div>
+    <div class="cc multi" data-val="C4080"   onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C4080 / C4070</div><div class="cc-spec">80/70 ppm · SRA3 · IC-609</div></div></div>
+    <div class="cc multi" data-val="C14000"  onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C14000 / C12000</div><div class="cc-spec">140/120 ppm · IC-610</div></div></div>
+    <div class="cc multi" data-val="C84hc"   onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C84hc</div><div class="cc-spec">81 ppm · High Chroma · FOGRA</div></div></div>
+    <div class="cc multi" data-val="C83hc"   onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress C83hc</div><div class="cc-spec">83 ppm · High Chroma · Compact</div></div></div>
+    <div class="cc multi" data-val="V180"    onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioPress V180</div><div class="cc-spec">180 ppm · Monochrome</div></div></div>
+    <div class="cc multi" data-val="inkjet"  onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">AccurioJet / Inkjet</div><div class="cc-spec">Production inkjet · High Speed</div></div></div>
+    <div class="cc multi" data-val="tbd"     onclick="toggleCard(this,'km-machines')"><div class="cb"></div><div><div class="cc-label">TBD / Under Discussion</div><div class="cc-spec">Machine to be confirmed</div></div></div>
+  </div>
+
+  <p class="hint" id="hint-2">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Select operation size and at least one KM machine to continue.
+  </p>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost"   onclick="goTo(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(3)">Next: Challenges →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3
+══════════════════════════════════════ -->
+<div class="screen" id="screen-3">
+  <h1 class="pg-title">Current challenges</h1>
+  <p class="pg-desc">Select every pain point the customer is currently facing. More context produces a more targeted recommendation.</p>
+
+  <div id="challenges-container"></div>
+
+  <p class="hint" id="hint-3">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Select at least one challenge to continue.
+  </p>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost"   onclick="goTo(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(4)">Generate Recommendation →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 4 — Results
+══════════════════════════════════════ -->
+<div class="screen" id="screen-4">
+  <div id="results-content"></div>
+  <div class="action-row">
+    <button class="btn btn-ghost"   onclick="goTo(3)">← Revise</button>
+    <button class="btn btn-outline" onclick="startOver()">New Customer</button>
+    <button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button>
+  </div>
+</div>
+
+</main>
+
+<!-- ── Footer ───────────────────────────────────── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-copy">©2017-2024 Konica Minolta Business Solutions Asia Pte Ltd</span>
+    <a class="footer-link" href="https://www.konicaminolta.sg/business/terms-of-use/" target="_blank">Terms of Use &amp; Privacy Policy</a>
+  </div>
+</footer>
+
+<script>
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+const state = {
+  custType: null, custEmail: '', salesRep: '', custName: '',
+  size: null, machines: [], kmMachines: [],
+  designSoftware: [], prepressWorkflow: [], prepressOther: '',
+  currentEnv: {}, challenges: []
+};
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+let currentScreen = 0;
+
+function goTo(n) {
+  if (n > currentScreen) {
+    if (currentScreen === 1) {
+      if (!state.custType) { document.getElementById('hint-1').classList.add('show'); return; }
+      state.custName  = document.getElementById('customer-name').value  || 'Customer';
+      state.custEmail = document.getElementById('customer-email').value || '';
+      state.salesRep  = document.getElementById('sales-rep').value      || '';
+      document.getElementById('hint-1').classList.remove('show');
+    }
+    if (currentScreen === 2) {
+      if (!state.size || state.kmMachines.length === 0) { document.getElementById('hint-2').classList.add('show'); return; }
+      document.getElementById('hint-2').classList.remove('show');
+    }
+    if (currentScreen === 3) {
+      if (state.challenges.length === 0) { document.getElementById('hint-3').classList.add('show'); return; }
+      document.getElementById('hint-3').classList.remove('show');
+      buildResults();
+    }
+  }
+  if (n === 3) buildChallenges();
+
+  // Show/hide stepnav — hidden only on intro
+  document.getElementById('stepnav').style.display = (n === 0) ? 'none' : '';
+
+  document.getElementById('screen-' + currentScreen).classList.remove('active');
+  document.getElementById('screen-' + n).classList.add('active');
+  currentScreen = n;
+  if (n >= 1) updateProgress(n);
+  window.scrollTo(0, 0);
+}
+
+function updateProgress(n) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('si-' + i);
+    el.classList.remove('active', 'done');
+    if      (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
+
+function startOver() {
+  Object.assign(state, {
+    custType:null, custName:'', custEmail:'', salesRep:'', size:null,
+    machines:[], kmMachines:[], designSoftware:[], prepressWorkflow:[],
+    prepressOther:'', currentEnv:{}, challenges:[]
+  });
+  document.querySelectorAll('.seg-cell, .cc').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.t, .sz').forEach(t => t.classList.remove('selected'));
+  ['customer-name','customer-email','sales-rep','prepress-other'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  goTo(1);
+}
+
+// ════════════════════════════════════════
+// SELECTION HELPERS
+// ════════════════════════════════════════
+function selectOne(el, key) {
+  const grid = el.closest('.seg-grid') || document.getElementById('cust-type-grid');
+  if (grid) grid.querySelectorAll('.seg-cell').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  if (key === 'cust-type') state.custType = el.dataset.val;
+}
+
+function toggleCard(el, key) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const arr = key === 'km-machines' ? state.kmMachines : state.machines;
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+}
+
+function togglePillArr(el, arrKey) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const arr = state[arrKey];
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+}
+
+function toggleEnv(el) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val, cat = el.dataset.cat;
+  if (!state.currentEnv[cat]) state.currentEnv[cat] = [];
+  const arr = state.currentEnv[cat];
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+}
+
+function togglePill(el) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const idx = state.machines.indexOf(val);
+  if (idx === -1) state.machines.push(val); else state.machines.splice(idx, 1);
+}
+
+function selectSize(el) {
+  document.querySelectorAll('.sz').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.size = el.dataset.val;
+}
+
+// ════════════════════════════════════════
+// CHALLENGES DATA
+// ════════════════════════════════════════
+const CHALLENGE_GROUPS = {
+  color: {
+    label: 'Color Management',
+    items: [
+      { val:'color-inconsistency', label:'Color inconsistency across devices/shifts' },
+      { val:'no-icc',              label:'No ICC profiles or color standards in place' },
+      { val:'brand-color',         label:'Client brand color matching required' },
+      { val:'pantone',             label:'Pantone / spot color matching demands' },
+      { val:'proofing',            label:'No soft proofing or color approval process' },
+      { val:'color-expertise',     label:'Limited color management knowledge on team' },
+      { val:'g7-fogra',            label:'G7 / FOGRA compliance required by clients' },
+      { val:'reprints',            label:'High reprint rate due to color errors' }
+    ]
+  },
+  workflow: {
+    label: 'Workflow & Automation',
+    items: [
+      { val:'manual-prepress', label:'Manual prepress — operator fixing files manually' },
+      { val:'no-preflight',    label:'No automated preflight / file validation' },
+      { val:'job-intake',      label:'Job intake via email, WhatsApp, or walk-in only' },
+      { val:'no-routing',      label:'No automated job routing between devices' },
+      { val:'no-tracking',     label:'No job status tracking or visibility' },
+      { val:'bottlenecks',     label:'Production bottlenecks and missed deadlines' },
+      { val:'multi-device',    label:'Multiple devices with no central management' },
+      { val:'hot-folders',     label:'No hot folder automation' },
+      { val:'imposition',      label:'Manual imposition wasting paper' }
+    ]
+  },
+  business: {
+    label: 'Business & Client',
+    items: [
+      { val:'client-portal',    label:'Clients want online job submission / B2B portal' },
+      { val:'spend-visibility', label:'No visibility over print spend / departmental billing' },
+      { val:'seasonal-peak',    label:'Seasonal volume peaks overwhelm the team' },
+      { val:'pricing',          label:'Difficulty pricing short-run jobs profitably' },
+      { val:'mis-integration',  label:'Need MIS / ERP / JDF integration' },
+      { val:'sla',              label:'Struggling to meet SLAs / tight turnarounds' },
+      { val:'secure-jobs',      label:'Need secure/access-controlled job submission' },
+      { val:'offset-to-digital',label:'Transitioning offset jobs to digital production' },
+      { val:'hybrid',           label:'Running hybrid offset + digital workflow' }
+    ]
+  }
+};
+
+function buildChallenges() {
+  state.challenges = [];
+  const container = document.getElementById('challenges-container');
+  container.innerHTML = '';
+  for (const [, group] of Object.entries(CHALLENGE_GROUPS)) {
+    const wrap = document.createElement('div');
+    wrap.style.marginBottom = '28px';
+
+    const hd = document.createElement('div');
+    hd.className = 'lbl';
+    hd.style.marginBottom = '10px';
+    hd.textContent = group.label;
+    wrap.appendChild(hd);
+
+    const grid = document.createElement('div');
+    grid.className = 'chk-grid';
+    group.items.forEach(item => {
+      const cell = document.createElement('div');
+      cell.className = 'cc';
+      cell.dataset.val = item.val;
+      cell.innerHTML = `<div class="cb"></div><div class="cc-label" style="font-weight:500;">${item.label}</div>`;
+      cell.onclick = () => {
+        cell.classList.toggle('selected');
+        const v = cell.dataset.val;
+        const i = state.challenges.indexOf(v);
+        if (i === -1) state.challenges.push(v); else state.challenges.splice(i, 1);
+      };
+      grid.appendChild(cell);
+    });
+    wrap.appendChild(grid);
+    container.appendChild(wrap);
+  }
+}
+
+// ════════════════════════════════════════
+// RECOMMENDATION ENGINE
+// ════════════════════════════════════════
+function computeRecommendation() {
+  const { custType, size, challenges, kmMachines } = state;
+
+  let fluxTier = 'Essential';
+  const needsUltimate = challenges.some(c => ['client-portal','mis-integration','hybrid','offset-to-digital','spend-visibility','secure-jobs'].includes(c));
+  const needsPremium  = challenges.some(c => ['client-portal','sla','seasonal-peak','pricing'].includes(c));
+  const hasMIS        = challenges.includes('mis-integration');
+
+  if      (custType === 'Schools')                         fluxTier = 'Ultimate';
+  else if (custType === 'Commercial' && size === 'Big')    fluxTier = 'Ultimate';
+  else if (custType === 'Commercial' && size === 'Medium') fluxTier = 'Premium';
+  else if (custType === 'Offset')   fluxTier = hasMIS ? 'Ultimate' : 'Premium';
+  else if (needsUltimate)           fluxTier = 'Ultimate';
+  else if (needsPremium)            fluxTier = 'Premium';
+  else                              fluxTier = 'Essential';
+
+  const needsSuite = challenges.some(c => ['brand-color','pantone','proofing','g7-fogra','color-expertise'].includes(c))
+                     || custType === 'CRD'
+                     || (custType === 'Commercial' && size !== 'Small');
+  const apcmTier = needsSuite ? 'Suite' : 'Essential';
+  const needsCloudEye = (custType === 'Commercial' && size === 'Big')
+                        || challenges.some(c => ['multi-device','no-tracking'].includes(c) && size === 'Big');
+
+  const sellingPoints = [];
+  if (challenges.includes('manual-prepress') || challenges.includes('no-preflight'))
+    sellingPoints.push('Automated preflight & prepress reduces operator time and eliminates costly reprints');
+  if (challenges.includes('job-intake'))
+    sellingPoints.push(fluxTier === 'Essential' ? 'Hot folders and job ticketing replace manual email intake' : 'B2B online portal gives clients 24/7 self-service job submission');
+  if (challenges.includes('multi-device') || challenges.includes('no-routing'))
+    sellingPoints.push('Central dashboard manages all devices with intelligent job routing');
+  if (challenges.includes('color-inconsistency') || challenges.includes('reprints'))
+    sellingPoints.push('APCM eliminates color inconsistency — directly reducing reprint costs and waste');
+  if (challenges.includes('brand-color') || challenges.includes('pantone'))
+    sellingPoints.push('APCM Suite ensures brand color accuracy and Pantone matching every time');
+  if (challenges.includes('spend-visibility') || challenges.includes('secure-jobs'))
+    sellingPoints.push('Departmental accounts and access controls give full print spend visibility');
+  if (challenges.includes('mis-integration') || challenges.includes('hybrid'))
+    sellingPoints.push('Flux Ultimate connects MIS/ERP via JDF/JMF for fully automated end-to-end production');
+  if (challenges.includes('offset-to-digital'))
+    sellingPoints.push('Seamless hybrid workflow bridges offset and digital production in one system');
+
+  const workflowSteps = buildWorkflowSteps(custType, fluxTier, apcmTier, kmMachines);
+  const currentNodes  = [`APCM ${apcmTier}`, `Flux ${fluxTier}`];
+  if (needsCloudEye) currentNodes.push('CloudEye');
+  return { fluxTier, apcmTier, needsCloudEye, sellingPoints, workflowSteps, currentNodes };
+}
+
+function buildWorkflowSteps(custType, fluxTier, apcmTier, machines) {
+  const steps = [];
+  if      (fluxTier === 'Essential') steps.push({ label:'Job Intake',        sub:'Hot Folders / Email', color:'slate', product:'Flux Essential' });
+  else if (fluxTier === 'Premium')   steps.push({ label:'Client Portal',     sub:'Job Submission',      color:'blue',  product:'Flux Premium' });
+  else                               steps.push({ label:'Online Storefront', sub:'B2B Portal',          color:'blue',  product:'Flux Ultimate' });
+  steps.push({ label:'Preflight',       sub:'Auto File Check',    color:'',     product:'Flux ' + fluxTier });
+  steps.push({ label:'Color Mgmt',      sub:'APCM ' + apcmTier,  color:'green',product:'APCM ' + apcmTier });
+  steps.push({ label:'Imposition',      sub:'Auto Layout',        color:'',     product:'Flux ' + fluxTier });
+  if (fluxTier !== 'Essential')
+    steps.push({ label:'Smart Routing', sub:'Rules-based',        color:'blue', product:'Flux ' + fluxTier });
+  const ml = machines.includes('C84hc') ? 'AccurioPress C84hc'
+           : machines.includes('C14000') ? 'AccurioPress C14000'
+           : machines.includes('C4080')  ? 'AccurioPress C4080'
+           : 'KM AccurioPress';
+  steps.push({ label:'Production Print',sub:ml,                   color:'amber',product:'KM AccurioPress' });
+  steps.push({ label:'Finishing',        sub:'Bindery / Output',  color:'slate',product:'Inline/Offline' });
+  if (fluxTier === 'Ultimate')
+    steps.push({ label:'MIS / Analytics',sub:'JDF/JMF',          color:'purple',product:'Flux Ultimate' });
+  return steps;
+}
+
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const CUST_LABELS = {
+  PFP:'Print for Pay (PFP)', CRD:'Corporate Reprographics (CRD)',
+  Commercial:'Commercial Printer', Schools:'Schools & Universities',
+  Government:'Government Institution', Offset:'Commercial Offset Printer'
+};
+const FLUX_FEATURES = {
+  Essential: ['Automated preflight & file validation','Hot folder automation & job ticketing','Auto imposition & PDF normalization','Central device management dashboard','Job routing across multiple printers','Device utilization visibility'],
+  Premium:   ['All Flux Essential features','Client-facing B2B job submission portal','Priority job routing & scheduling','Client proofing & approval workflow','Advanced automation rules engine','Multi-location job management'],
+  Ultimate:  ['All Flux Premium features','Online print storefront (B2B e-commerce)','JDF/JMF/MIS/ERP integration','Departmental accounts & chargeback billing','Access-controlled secure job submission','Full production analytics & SLA tracking']
+};
+const APCM_FEATURES = {
+  Essential: ['ICC profile creation & management','Auto color correction across devices','Basic Pantone color matching','Easy deployment — no heavy IT required','Color consistency for all print jobs','Supports multiple KM devices'],
+  Suite:     ['All APCM Essential features','Advanced multi-device color management','Soft proofing & color approval workflow','Full Pantone / brand color accuracy','G7 / FOGRA compliance readiness','CloudEye integration for remote monitoring']
+};
+const MACHINE_DETAILS = {
+  C5080:   { name:'AccurioPress C5080 / C5070',    desc:'Next-gen mid-high color production press at 80/70 ppm with advanced automation support. SRA3 media. IC-613 controller.',                  tags:['80/70 ppm','SRA3','IC-613'],          url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c5080-c5070/' },
+  C5065:   { name:'AccurioPrint C5065',             desc:'Entry-level production color press at 65 ppm. Compact footprint with strong automation features.',                                        tags:['65 ppm','Compact','IC-613'],           url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accurioprint-c5065/' },
+  C14010:  { name:'AccurioPress C14010 / C12010',   desc:'Flagship high-volume color press at 140/120 ppm. Built for commercial, large CRD and enterprise. IC-614 controller.',                   tags:['140/120 ppm','High Volume','IC-614'],  url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c14010-c12010/' },
+  C14010S: { name:'AccurioPress C14010S / C12010S', desc:'Super variant of the C14010 series with enhanced automation and finishing integration.',                                                  tags:['140/120 ppm','Super','IC-614'],        url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c14010-c12010/' },
+  C7100:   { name:'AccurioPress C7100 / C7090',     desc:'Compact versatile color production press at 100/90 ppm. Ideal for PFP mid-range, schools, and light commercial.',                       tags:['100/90 ppm','Compact','IC-609'],       url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c7100-c7090/' },
+  C4080:   { name:'AccurioPress C4080 / C4070',     desc:'Mid-range color press at 80/70 ppm. Ideal for PFP, CRD, commercial mid-volume. Wide media support.',                                    tags:['80/70 ppm','SRA3','IC-609'],           url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c4080-c4070/' },
+  C14000:  { name:'AccurioPress C14000 / C12000',   desc:'High-speed, high-volume color press at 140/120 ppm. Best for large commercial and enterprise production.',                               tags:['140/120 ppm','High Volume','IC-610'],  url:'https://www.konicaminolta.com/global-en/business/production-print/' },
+  C84hc:   { name:'AccurioPress C84hc',             desc:'High Chroma toner press with extended color gamut exceeding sRGB. FOGRA certified. Ideal for photobooks and brand-critical work.',      tags:['81 ppm','High Chroma','FOGRA Certified'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c84hc/' },
+  C83hc:   { name:'AccurioPress C83hc',             desc:'Compact High Chroma toner press with wide gamut output for vivid color in a smaller footprint.',                                         tags:['83 ppm','High Chroma','Compact'],      url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c83hc/' },
+  V180:    { name:'AccurioPress V180',               desc:'High-speed mono production press at 180 ppm. Ideal for transactional, book, and high-volume B&W output.',                               tags:['180 ppm','B&W','Transactional'],       url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-v180/' },
+  inkjet:  { name:'AccurioJet Series',               desc:'Production inkjet for high-speed, cost-effective output. Ideal for books, direct mail, and transactional applications.',               tags:['Inkjet','High Speed','Books'],         url:'https://www.konicaminolta.com/global-en/business/production-print/inkjet/' },
+  tbd:     { name:'KM AccurioPress (TBD)',           desc:'Machine selection to be confirmed based on volume, application, and budget requirements.',                                               tags:['To Be Confirmed'],                    url:'https://www.konicaminolta.com/global-en/business/production-print/' }
+};
+
+// ════════════════════════════════════════
+// BUILD RESULTS
+// ════════════════════════════════════════
+function buildResults() {
+  const rec = computeRecommendation();
+  const { fluxTier, apcmTier, needsCloudEye, sellingPoints, workflowSteps, currentNodes } = rec;
+  const custLabel = CUST_LABELS[state.custType] || state.custType;
+
+  const allItems    = Object.values(CHALLENGE_GROUPS).flatMap(g => g.items);
+  const challLabels = state.challenges.map(v => allItems.find(i => i.val === v)?.label || v);
+
+  const ENV_LABELS = { MIS:'MIS', ERP:'ERP', Workflow:'Workflow', ColorMgmt:'Color Mgmt', W2P:'Web-to-Print', Finishing:'Finishing' };
+  const ENV_NAMES  = {
+    'efi-pace':'EFI Pace','printviz':'PrintVis','tharstern':'Tharstern','cerm':'CERM','no-mis':'None',
+    'sap':'SAP','netsuite':'Oracle NetSuite','ms-dynamics':'Microsoft Dynamics','no-erp':'None',
+    'agfa-apogee':'Agfa Apogee','esko-engine':'Esko Automation Engine','kodak-prinergy':'Kodak Prinergy',
+    'hd-prinect':'Heidelberg Prinect','flux-existing':'AccurioPro Flux','no-workflow':'None',
+    'gmg-env':'GMG','apcm-existing':'AccurioPro Color Manager','no-colormgmt':'None',
+    'webcenter':'WebCenter','printiq':'PrintIQ','custom-w2p':'Custom W2P','no-w2p':'None',
+    'saddle-stitch':'Saddle Stitcher','perfect-bind':'Perfect Binder','cutter':'Cutter',
+    'laminator':'Laminator','folder':'Folder/Inserter','no-finishing':'None'
+  };
+  const DESIGN_NAMES   = { 'indesign':'Adobe InDesign','photoshop':'Adobe Photoshop','illustrator':'Adobe Illustrator','acrobat':'Adobe Acrobat','coreldraw':'CorelDRAW','msword':'MS Word','msexcel':'MS Excel','msppt':'MS PowerPoint' };
+  const PREPRESS_NAMES = { 'prinergy':'Kodak Prinergy','prinect':'Heidelberg Prinect','apogee':'Agfa Apogee','esko-ae':'Esko Automation Engine','esko-dp':'Esko DeskPack','artpro':'ArtPro+','gmg-color':'GMG Color Server','gmg-open':'GMG OpenColor','gmg-proof':'GMG ColorProof','none-prepress':'None' };
+
+  // Workflow HTML
+  let wfHTML = '';
+  workflowSteps.forEach((s, i) => {
+    wfHTML += `<div class="wf-step"><div class="wf-box${s.color?' '+s.color:''}">${s.label}<div class="wf-ptag">${s.product}</div></div><div class="wf-sub">${s.sub}</div></div>`;
+    if (i < workflowSteps.length - 1) wfHTML += `<div class="wf-arr">›</div>`;
+  });
+
+  // Machine HTML
+  let machHTML = '';
+  const qrTargets = [];
+  if (state.kmMachines.length > 0 && !state.kmMachines.includes('tbd')) {
+    state.kmMachines.forEach(m => {
+      const d = MACHINE_DETAILS[m];
+      if (!d) return;
+      const tags = d.tags.map(t => `<span class="mach-tag">${t}</span>`).join('');
+      const qrId = `qr-${m}`;
+      qrTargets.push({ id:qrId, url:d.url || 'https://www.konicaminolta.com/global-en/business/production-print/' });
+      machHTML += `<div class="mach-item">
+        <div class="mach-badge">KM<br>AccurioPress</div>
+        <div class="mach-info">
+          <div class="mach-name">${d.name}</div>
+          <div class="mach-desc">${d.desc}</div>
+          <div class="mach-tags">${tags}</div>
+          <a class="mach-link" href="${d.url}" target="_blank">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Product page
+          </a>
+        </div>
+        <div class="mach-qr"><div id="${qrId}" style="width:72px;height:72px;"></div><div class="qr-cap">Scan for<br>product page</div></div>
+      </div>`;
+    });
+  } else {
+    machHTML = `<div class="mach-item">
+      <div class="mach-badge">KM<br>AccurioPress</div>
+      <div class="mach-info">
+        <div class="mach-name">Machine to be confirmed</div>
+        <div class="mach-desc">Based on the customer profile, we recommend exploring the AccurioPress range. Machine selection should be finalized after volume and application assessment.</div>
+        <div class="mach-tags"><span class="mach-tag">Pending Assessment</span></div>
+        <a class="mach-link" href="https://www.konicaminolta.com/global-en/business/production-print/" target="_blank">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          KM Production Print
+        </a>
+      </div>
+    </div>`;
+  }
+
+  // Upsell
+  const uNodes = ['APCM Essential','APCM Suite','Flux Essential','Flux Premium','Flux Ultimate'];
+  if (needsCloudEye) uNodes.push('CloudEye');
+  const uHTML = uNodes.map((n, i) =>
+    `<div class="gn${currentNodes.includes(n)?' current':''}">${n}</div>${i < uNodes.length-1 ? '<div class="g-arr">›</div>' : ''}`
+  ).join('');
+
+  // Selling points
+  const spHTML = sellingPoints.length > 0
+    ? sellingPoints.map(sp => `<li>${sp}</li>`).join('')
+    : `<li style="color:var(--gray-2);">Solutions matched to customer's operation profile.</li>`;
+
+  // Environment table rows
+  const envRows = [
+    ...Object.entries(state.currentEnv).filter(([,v]) => v.length > 0).map(([cat, vals]) => {
+      const f = vals.filter(v => !v.startsWith('no-'));
+      if (!f.length) return '';
+      return `<tr><td>${ENV_LABELS[cat]||cat}</td><td>${f.map(v => ENV_NAMES[v]||v).join(', ')}</td></tr>`;
+    }),
+    state.designSoftware.length
+      ? `<tr><td>Design Software</td><td>${state.designSoftware.map(v=>DESIGN_NAMES[v]||v).join(', ')}</td></tr>` : '',
+    state.prepressWorkflow.filter(v => v !== 'none-prepress').length
+      ? `<tr><td>Prepress</td><td>${state.prepressWorkflow.filter(v=>v!=='none-prepress').map(v=>PREPRESS_NAMES[v]||v).join(', ')}${state.prepressOther ? ', '+state.prepressOther : ''}</td></tr>` : ''
+  ].filter(Boolean);
+
+  const hasEnvData = envRows.length > 0;
+
+  const svgWorkflow = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><path d="M5 9v3a1 1 0 001 1h12a1 1 0 001-1V9"/><path d="M12 13v5"/></svg>`;
+  const svgColor    = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="12" r="5"/><circle cx="16" cy="12" r="5"/></svg>`;
+  const svgEye      = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  const svgLink     = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+
+  const html = `
+    <div class="doc-hdr">
+      <div class="doc-hdr-body">
+        <div class="doc-eyebrow">Solution Recommendation — Konica Minolta Production Print</div>
+        <div class="doc-name">${state.custName}</div>
+        <div class="doc-date">${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+        ${state.custEmail ? `<div class="doc-meta">Email: ${state.custEmail}</div>` : ''}
+        ${state.salesRep  ? `<div class="doc-meta">Sales Representative: ${state.salesRep}</div>` : ''}
+        <div class="doc-chips">
+          <span class="doc-chip">${custLabel}</span>
+          <span class="doc-chip">${state.size}</span>
+          <span class="doc-chip">Flux ${fluxTier}</span>
+          <span class="doc-chip">APCM ${apcmTier}</span>
+          ${needsCloudEye ? '<span class="doc-chip">CloudEye</span>' : ''}
+        </div>
+      </div>
+      <div style="flex-shrink:0;text-align:center;">
+        <div id="qr-header" style="width:80px;height:80px;background:white;border-radius:3px;padding:4px;"></div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:4px;line-height:1.4;">KM Production<br>Print</div>
+      </div>
+    </div>
+
+    ${hasEnvData ? `
+    <div class="dsect">
+      <div class="dsect-title">Current Environment Profile</div>
+      <table class="env-tbl">${envRows.join('')}</table>
+    </div>` : ''}
+
+    <div class="dsect">
+      <div class="dsect-title">Identified Challenges — ${challLabels.length} selected</div>
+      <div class="chall-wrap">${challLabels.map(l=>`<span class="chall-item">${l}</span>`).join('')}</div>
+    </div>
+
+    <div class="dsect">
+      <div class="dsect-title">Recommended Solutions</div>
+      <div class="rec-block">
+        <div class="rec-block-hd">
+          <span style="color:var(--blue);">${svgWorkflow}</span>
+          <span class="rec-name">AccurioPro Flux ${fluxTier}</span>
+          <span class="rec-type">Digital Production Workflow</span>
+        </div>
+        <ul class="rec-feats">${FLUX_FEATURES[fluxTier].map(f=>`<li>${f}</li>`).join('')}</ul>
+      </div>
+      <div class="rec-block color">
+        <div class="rec-block-hd">
+          <span style="color:var(--green);">${svgColor}</span>
+          <span class="rec-name">AccurioPro Color Manager ${apcmTier}</span>
+          <span class="rec-type">Color Management</span>
+        </div>
+        <ul class="rec-feats">${APCM_FEATURES[apcmTier].map(f=>`<li>${f}</li>`).join('')}</ul>
+      </div>
+      ${needsCloudEye ? `
+      <div class="cloudeye">
+        <div class="cloudeye-ico">${svgEye}</div>
+        <div>
+          <div class="cloudeye-name">CloudEye — Remote Color Monitoring</div>
+          <div class="cloudeye-desc">Real-time remote color monitoring across all devices and shifts. Provides instant deviation alerts and centralized reporting — essential for large multi-press operations.</div>
+        </div>
+      </div>` : ''}
+    </div>
+
+    <div class="dsect">
+      <div class="dsect-title">Recommended KM Machine(s)</div>
+      ${machHTML}
+    </div>
+
+    <div class="dsect">
+      <div class="dsect-title">Recommended Production Workflow</div>
+      <div class="wf-scroll"><div class="wf-flow">${wfHTML}</div></div>
+      <div class="wf-legend">
+        <div class="wf-leg"><div class="wf-dot" style="background:var(--blue);"></div>Flux ${fluxTier}</div>
+        <div class="wf-leg"><div class="wf-dot" style="background:var(--green);"></div>APCM ${apcmTier}</div>
+        <div class="wf-leg"><div class="wf-dot" style="background:var(--amber);"></div>KM AccurioPress</div>
+        <div class="wf-leg"><div class="wf-dot" style="background:var(--slate);"></div>Standard</div>
+      </div>
+    </div>
+
+    <div class="dsect">
+      <div class="dsect-title">Why This Solution Fits</div>
+      <ul class="sp-list">${spHTML}</ul>
+    </div>
+
+    <div class="dsect">
+      <div class="dsect-title">Growth Path &amp; Upsell Opportunity</div>
+      <div class="growth-box">
+        <div class="growth-nodes">${uHTML}</div>
+        <div class="growth-note">Start with the highlighted tier. As requirements grow, the solution scales — no rip-and-replace, just an upgrade.</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('results-content').innerHTML = html;
+
+  setTimeout(() => {
+    try {
+      new QRCode(document.getElementById('qr-header'), {
+        text:'https://www.konicaminolta.com/global-en/business/production-print/',
+        width:80, height:80, colorDark:'#0D1F3C', colorLight:'#FFFFFF',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) {}
+    qrTargets.forEach(({ id, url }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      try {
+        new QRCode(el, { text:url, width:72, height:72, colorDark:'#0D1F3C', colorLight:'#FFFFFF', correctLevel:QRCode.CorrectLevel.M });
+      } catch(e) {}
+    });
+  }, 100);
+}
+</script>
+</body>
+</html>

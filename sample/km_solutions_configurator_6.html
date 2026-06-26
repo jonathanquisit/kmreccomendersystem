@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KM PP Solutions Configurator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,400;0,700;1,400&display=swap');
+
+  :root {
+    --navy: #0D1F3C;
+    --navy-mid: #1A3558;
+    --teal: #0A7EA4;
+    --teal-lt: #12A0CC;
+    --mint: #02C39A;
+    --white: #FFFFFF;
+    --off-white: #F4F7FB;
+    --gray: #64748B;
+    --gray-lt: #E2EBF4;
+    --text: #1E293B;
+    --muted: #94A3B8;
+    --amber: #D97706;
+    --purple: #6D28D9;
+    --rose: #BE123C;
+    --green: #059669;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(13,31,60,0.10);
+    --shadow-lg: 0 8px 40px rgba(13,31,60,0.16);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--off-white);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--navy);
+    padding: 0 40px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-logo {
+    width: 36px; height: 36px;
+    background: var(--teal);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .header-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--white);
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .header-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .header-badge {
+    background: rgba(2,195,154,0.15);
+    color: var(--mint);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(2,195,154,0.3);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Progress bar ── */
+  .progress-wrap {
+    background: var(--navy-mid);
+    padding: 0 40px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    flex: 1;
+    transition: color 0.3s;
+  }
+  .step-item.active { color: var(--white); }
+  .step-item.done { color: var(--mint); }
+  .step-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step-item.active .step-dot {
+    border-color: var(--teal);
+    background: var(--teal);
+    color: white;
+  }
+  .step-item.done .step-dot {
+    border-color: var(--mint);
+    background: var(--mint);
+    color: white;
+  }
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 8px;
+    transition: background 0.3s;
+  }
+  .step-line.done { background: var(--mint); }
+
+  /* ── Main content ── */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Screen ── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp 0.35s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section heading ── */
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .section-desc {
+    font-size: 15px;
+    color: var(--gray);
+    margin-bottom: 32px;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  /* ── Card grid ── */
+  .card-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  /* ── Selectable card ── */
+  .sel-card {
+    background: var(--white);
+    border: 2px solid var(--gray-lt);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    box-shadow: var(--shadow);
+  }
+  .sel-card:hover {
+    border-color: var(--teal);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .sel-card.selected {
+    border-color: var(--teal);
+    background: rgba(10,126,164,0.04);
+  }
+  .sel-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 22px; height: 22px;
+    background: var(--mint);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+  }
+  .sel-card.multi.selected { border-color: var(--teal); }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .card-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+  .card-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Checkbox pills (for multi-select challenges) ── */
+  .pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .pill {
+    background: var(--white);
+    border: 2px solid var(--gray-lt);
+    border-radius: 24px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .pill:hover { border-color: var(--teal); color: var(--teal); }
+  .pill.selected {
+    border-color: var(--teal);
+    background: var(--teal);
+    color: white;
+  }
+
+  /* ── Navigation buttons ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-lt);
+  }
+  .btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-primary {
+    background: var(--teal);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--teal-lt); transform: translateY(-1px); }
+  .btn-primary:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--gray);
+    border: 2px solid var(--gray-lt);
+  }
+  .btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
+  .btn-navy {
+    background: var(--navy);
+    color: white;
+  }
+  .btn-navy:hover { background: var(--navy-mid); }
+  .btn-mint {
+    background: var(--mint);
+    color: white;
+  }
+  .btn-mint:hover { background: #01a882; }
+
+  /* ── Input ── */
+  .field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .text-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid var(--gray-lt);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 16px;
+  }
+  .text-input:focus { border-color: var(--teal); }
+
+  /* ── Size radio ── */
+  .size-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .size-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid var(--gray-lt);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray);
+    background: var(--white);
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .size-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .size-btn.selected { border-color: var(--teal); background: var(--teal); color: white; }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--gray-lt);
+    margin: 28px 0;
+  }
+
+  /* ════════════════════════════════════════
+     RESULTS SCREEN
+  ════════════════════════════════════════ */
+  .result-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: var(--teal);
+    border-radius: 50%;
+    opacity: 0.12;
+  }
+  .result-header-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--mint);
+    margin-bottom: 8px;
+  }
+  .result-header-title {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .result-header-sub {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .result-header-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+  }
+
+  /* Recommendation card */
+  .rec-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 14px;
+  }
+  .rec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .rec-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--teal);
+  }
+  .rec-card.color { border-left-color: var(--mint); }
+  .rec-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .rec-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .rec-icon.workflow { background: rgba(10,126,164,0.12); }
+  .rec-icon.color-bg { background: rgba(2,195,154,0.12); }
+  .rec-icon.machine { background: rgba(13,31,60,0.08); }
+  .rec-product-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .rec-product-type {
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 500;
+  }
+  .rec-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rec-features li {
+    font-size: 12.5px;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .rec-features li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+    font-weight: 700;
+  }
+  .rec-card.color .rec-features li::before { color: var(--mint); }
+
+  /* Machine recommendation */
+  .machine-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .machine-badge {
+    background: var(--navy);
+    color: white;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    flex-shrink: 0;
+    min-width: 90px;
+    letter-spacing: 0.5px;
+  }
+  .machine-name { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .machine-desc { font-size: 12.5px; color: var(--gray); line-height: 1.55; }
+  .machine-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 12px;
+    letter-spacing: 0.4px;
+  }
+  .tag-teal { background: rgba(10,126,164,0.1); color: var(--teal); }
+  .tag-mint { background: rgba(2,195,154,0.1); color: var(--green); }
+  .tag-navy { background: rgba(13,31,60,0.08); color: var(--navy); }
+
+  /* Challenges summary */
+  .challenges-bar {
+    background: rgba(215,119,6,0.07);
+    border: 1px solid rgba(215,119,6,0.2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .challenges-bar-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--amber);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .challenges-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .challenge-pill {
+    font-size: 12px;
+    background: white;
+    border: 1px solid rgba(215,119,6,0.3);
+    color: var(--amber);
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: 500;
+  }
+
+  /* Workflow diagram */
+  .workflow-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+  .workflow-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--teal);
+    margin-bottom: 20px;
+  }
+  .workflow-diagram {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .wf-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 110px;
+  }
+  .wf-box {
+    background: var(--navy);
+    color: white;
+    border-radius: 10px;
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    width: 100%;
+    line-height: 1.4;
+    position: relative;
+  }
+  .wf-box.teal { background: var(--teal); }
+  .wf-box.mint { background: var(--mint); color: var(--navy); }
+  .wf-box.amber { background: var(--amber); }
+  .wf-box.purple { background: var(--purple); }
+  .wf-box.gray { background: #4B5563; }
+  .wf-icon { font-size: 18px; display: block; margin-bottom: 5px; }
+  .wf-label { font-size: 10px; color: var(--muted); text-align: center; margin-top: 6px; }
+  .wf-arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    color: var(--muted);
+    font-size: 18px;
+    flex-shrink: 0;
+    padding-bottom: 24px;
+  }
+  .wf-product-tag {
+    font-size: 9px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin-top: 4px;
+    display: inline-block;
+  }
+
+  /* Upsell path */
+  .upsell-card {
+    background: linear-gradient(135deg, var(--navy) 0%, #0f2d50 100%);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .upsell-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--mint);
+    margin-bottom: 14px;
+  }
+  .upsell-path {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .upsell-node {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+  }
+  .upsell-node.current {
+    background: var(--teal);
+    border-color: var(--teal);
+  }
+  .upsell-arrow { color: var(--muted); font-size: 16px; }
+
+  /* Print / action row */
+  .action-row {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  /* ════════════════════════════════════════
+     PRINT STYLES
+  ════════════════════════════════════════ */
+  @media print {
+    body { background: white; }
+    .header, .progress-wrap, .nav-row, .action-row, .screen:not(.active) { display: none !important; }
+    .main { padding: 0; max-width: 100%; }
+    .result-header { background: var(--navy) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .rec-card, .machine-card, .workflow-section, .upsell-card, .challenges-bar { box-shadow: none; border: 1px solid var(--gray-lt); }
+    .wf-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page-break { page-break-before: always; }
+  }
+
+  /* ── Environment groups ── */
+  .env-group {
+    background: var(--white);
+    border: 1px solid var(--gray-lt);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .env-group-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Validation hint ── */
+  .hint { font-size: 12px; color: var(--rose); margin-top: -8px; margin-bottom: 12px; display: none; }
+  .hint.show { display: block; }
+
+  /* ── Tooltip on card ── */
+  .info-chip {
+    font-size: 10px;
+    background: var(--off-white);
+    color: var(--gray);
+    padding: 3px 8px;
+    border-radius: 8px;
+    margin-top: 6px;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">🖨</div>
+    <div>
+      <div class="header-title">KM Solutions Configurator</div>
+      <div class="header-subtitle">Production Print · Sales Tool</div>
+    </div>
+  </div>
+  <div class="header-badge">PRESALES REFERENCE</div>
+</header>
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="step-indicator">
+    <div class="step-item active" id="si-1">
+      <div class="step-dot">1</div>
+      <span>Customer</span>
+    </div>
+    <div class="step-line" id="sl-1"></div>
+    <div class="step-item" id="si-2">
+      <div class="step-dot">2</div>
+      <span>Setup</span>
+    </div>
+    <div class="step-line" id="sl-2"></div>
+    <div class="step-item" id="si-3">
+      <div class="step-dot">3</div>
+      <span>Challenges</span>
+    </div>
+    <div class="step-line" id="sl-3"></div>
+    <div class="step-item" id="si-4">
+      <div class="step-dot">4</div>
+      <span>Recommendation</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══════════════════════════════════
+     SCREEN 1 — Customer Type
+══════════════════════════════════ -->
+<div class="screen active" id="screen-1">
+  <div class="section-eyebrow">Step 1 of 4</div>
+  <div class="section-title">Who is your customer?</div>
+  <div class="section-desc">Select the customer segment. This determines the relevant solution stack and workflow recommendation.</div>
+
+  <div style="margin-bottom:20px;">
+    <label class="field-label">Customer / Company Name</label>
+    <input class="text-input" id="customer-name" placeholder="e.g. Printco Asia, ABC University…" style="max-width:400px;">
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;max-width:640px;">
+    <div>
+      <label class="field-label">Customer Email Address</label>
+      <input class="text-input" id="customer-email" placeholder="e.g. john@printco.com" style="margin-bottom:0;">
+    </div>
+    <div>
+      <label class="field-label">Sales Representative</label>
+      <input class="text-input" id="sales-rep" placeholder="e.g. Jane Smith" style="margin-bottom:0;">
+    </div>
+  </div>
+
+  <div class="card-grid cols-3" id="cust-type-grid">
+    <div class="sel-card" data-val="PFP" onclick="selectOne(this,'cust-type')">
+      <span class="card-icon">🖼</span>
+      <div class="card-label">PFP — Print for Pay</div>
+      <div class="card-desc">Photo labs, quick print shops, kiosks, PFP bureaus producing customer-ordered prints.</div>
+      <span class="card-tag" style="background:rgba(10,126,164,0.1);color:var(--teal);">Photo · Kiosk · PFP Shop</span>
+    </div>
+    <div class="sel-card" data-val="CRD" onclick="selectOne(this,'cust-type')">
+      <span class="card-icon">🏢</span>
+      <div class="card-label">CRD — Corporate Reprographics</div>
+      <div class="card-desc">In-house print department of a corporation. Multiple internal requestors, brand compliance required.</div>
+      <span class="card-tag" style="background:rgba(109,40,217,0.1);color:var(--purple);">In-plant · Corporate</span>
+    </div>
+    <div class="sel-card" data-val="Commercial" onclick="selectOne(this,'cust-type')">
+      <span class="card-icon">🏭</span>
+      <div class="card-label">Commercial Printer</div>
+      <div class="card-desc">B2B commercial print shop serving agencies, brands, and enterprises with diverse job types.</div>
+      <span class="card-tag" style="background:rgba(190,18,60,0.1);color:var(--rose);">Commercial · B2B Print</span>
+    </div>
+    <div class="sel-card" data-val="Schools" onclick="selectOne(this,'cust-type')">
+      <span class="card-icon">🎓</span>
+      <div class="card-label">Schools &amp; Universities</div>
+      <div class="card-desc">Campus print centers serving students, faculty, and departments with recurring print needs.</div>
+      <span class="card-tag" style="background:rgba(2,195,154,0.1);color:var(--green);">Education · Campus</span>
+    </div>
+    <div class="sel-card" data-val="Government" onclick="selectOne(this,'cust-type')">
+      <span class="card-icon">🏛</span>
+      <div class="card-label">Government Institution</div>
+      <div class="card-desc">Public sector in-plant print operations with compliance, security, and procurement constraints.</div>
+      <span class="card-tag" style="background:rgba(215,119,6,0.1);color:var(--amber);">Public Sector · In-plant</span>
+    </div>
+    <div class="sel-card" data-val="Offset" onclick="selectOne(this,'cust-type')">
+      <span class="card-icon">⚙️</span>
+      <div class="card-label">Commercial Offset Printer</div>
+      <div class="card-desc">Traditional offset printer looking to add or transition to digital production print capabilities.</div>
+      <span class="card-tag" style="background:rgba(13,31,60,0.08);color:var(--navy);">Offset · Hybrid · Digital Transition</span>
+    </div>
+  </div>
+
+  <p class="hint" id="hint-1">Please select a customer type to continue.</p>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn btn-primary" onclick="goTo(2)">Next: Production Setup →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN 2 — Current Setup
+══════════════════════════════════ -->
+<div class="screen" id="screen-2">
+  <div class="section-eyebrow">Step 2 of 4</div>
+  <div class="section-title">Current production setup</div>
+  <div class="section-desc">Tell us about the customer's existing environment. Select all that apply — this helps us recommend the right entry point.</div>
+
+  <label class="field-label">Operation size</label>
+  <div class="size-row">
+    <div class="size-btn" data-val="Small" onclick="selectSize(this)">Small<br><span style="font-size:10px;font-weight:400;color:inherit">1–5 staff</span></div>
+    <div class="size-btn" data-val="Medium" onclick="selectSize(this)">Medium<br><span style="font-size:10px;font-weight:400;color:inherit">6–20 staff</span></div>
+    <div class="size-btn" data-val="Big" onclick="selectSize(this)">Large<br><span style="font-size:10px;font-weight:400;color:inherit">20+ staff</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <label class="field-label" style="margin-bottom:12px;">Current machines / resources <span style="font-weight:400;color:var(--gray)">(select all that apply)</span></label>
+  <div class="pill-grid" id="machines-grid">
+    <div class="pill multi" data-val="startup" onclick="togglePill(this,'machines')">No machines — Startup</div>
+    <div class="pill multi" data-val="no-offset" onclick="togglePill(this,'machines')">No offset machines</div>
+    <div class="pill multi" data-val="offset" onclick="togglePill(this,'machines')">Offset Press</div>
+    <div class="pill multi" data-val="digital-press" onclick="togglePill(this,'machines')">Digital Press (existing)</div>
+    <div class="pill multi" data-val="inkjet-existing" onclick="togglePill(this,'machines')">Inkjet Printer</div>
+    <div class="pill multi" data-val="mfp" onclick="togglePill(this,'machines')">MFP / Copier</div>
+    <div class="pill multi" data-val="wide-format" onclick="togglePill(this,'machines')">Wide Format Printer</div>
+    <div class="pill multi" data-val="rip" onclick="togglePill(this,'machines')">RIP / DFE Software</div>
+    <div class="pill multi" data-val="finishing" onclick="togglePill(this,'machines')">Finishing / Bindery</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── Design & Creative Software ── -->
+  <label class="field-label" style="margin-bottom:4px;">Design &amp; Creative Software <span style="font-weight:400;color:var(--gray)">(select all that apply)</span></label>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Helps identify file format compatibility and prepress complexity</div>
+  <div class="pill-grid" id="design-software-grid">
+    <div class="pill multi" data-val="indesign" onclick="togglePillArr(this,'designSoftware')">Adobe InDesign</div>
+    <div class="pill multi" data-val="photoshop" onclick="togglePillArr(this,'designSoftware')">Adobe Photoshop</div>
+    <div class="pill multi" data-val="illustrator" onclick="togglePillArr(this,'designSoftware')">Adobe Illustrator</div>
+    <div class="pill multi" data-val="acrobat" onclick="togglePillArr(this,'designSoftware')">Adobe Acrobat</div>
+    <div class="pill multi" data-val="coreldraw" onclick="togglePillArr(this,'designSoftware')">CorelDRAW</div>
+    <div class="pill multi" data-val="msword" onclick="togglePillArr(this,'designSoftware')">Microsoft Word</div>
+    <div class="pill multi" data-val="msexcel" onclick="togglePillArr(this,'designSoftware')">Microsoft Excel</div>
+    <div class="pill multi" data-val="msppt" onclick="togglePillArr(this,'designSoftware')">Microsoft PowerPoint</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── Prepress Workflow Software ── -->
+  <label class="field-label" style="margin-bottom:4px;">Prepress Workflow Software <span style="font-weight:400;color:var(--gray)">(select all that apply)</span></label>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Identifies integration requirements and potential workflow overlaps</div>
+  <div class="pill-grid" id="prepress-grid">
+    <div class="pill multi" data-val="prinergy" onclick="togglePillArr(this,'prepressWorkflow')">Kodak Prinergy</div>
+    <div class="pill multi" data-val="prinect" onclick="togglePillArr(this,'prepressWorkflow')">Heidelberg Prinect</div>
+    <div class="pill multi" data-val="apogee" onclick="togglePillArr(this,'prepressWorkflow')">Agfa Apogee</div>
+    <div class="pill multi" data-val="esko-ae" onclick="togglePillArr(this,'prepressWorkflow')">Esko Automation Engine</div>
+    <div class="pill multi" data-val="esko-dp" onclick="togglePillArr(this,'prepressWorkflow')">Esko DeskPack</div>
+    <div class="pill multi" data-val="artpro" onclick="togglePillArr(this,'prepressWorkflow')">ArtPro+</div>
+    <div class="pill multi" data-val="gmg-color" onclick="togglePillArr(this,'prepressWorkflow')">GMG Color Server</div>
+    <div class="pill multi" data-val="gmg-open" onclick="togglePillArr(this,'prepressWorkflow')">GMG OpenColor</div>
+    <div class="pill multi" data-val="gmg-proof" onclick="togglePillArr(this,'prepressWorkflow')">GMG ColorProof</div>
+    <div class="pill multi" data-val="none-prepress" onclick="togglePillArr(this,'prepressWorkflow')">None / Manual</div>
+  </div>
+  <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+    <label class="field-label" style="white-space:nowrap;margin-bottom:0;">Other:</label>
+    <input class="text-input" id="prepress-other" placeholder="e.g. Enfocus Switch, Dalim, ColorThink…" style="margin-bottom:0;flex:1;max-width:400px;" oninput="state.prepressOther=this.value">
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── Current Environment ── -->
+  <label class="field-label" style="margin-bottom:4px;">Current Environment <span style="font-weight:400;color:var(--gray)">(select all that apply per category)</span></label>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Identifies systems already in use — helps position Flux integration and avoid overlap</div>
+
+  <div id="current-env-grid" style="display:flex;flex-direction:column;gap:14px;">
+
+    <!-- MIS -->
+    <div class="env-group">
+      <div class="env-group-label">📊 MIS — Management Information System</div>
+      <div class="pill-grid" style="margin-top:8px;">
+        <div class="pill multi" data-val="efi-pace" data-cat="MIS" onclick="toggleEnv(this)">EFI Pace</div>
+        <div class="pill multi" data-val="printviz" data-cat="MIS" onclick="toggleEnv(this)">PrintVis</div>
+        <div class="pill multi" data-val="tharstern" data-cat="MIS" onclick="toggleEnv(this)">Tharstern</div>
+        <div class="pill multi" data-val="cerm" data-cat="MIS" onclick="toggleEnv(this)">CERM</div>
+        <div class="pill multi" data-val="no-mis" data-cat="MIS" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+
+    <!-- ERP -->
+    <div class="env-group">
+      <div class="env-group-label">🏗 ERP — Enterprise Resource Planning</div>
+      <div class="pill-grid" style="margin-top:8px;">
+        <div class="pill multi" data-val="sap" data-cat="ERP" onclick="toggleEnv(this)">SAP</div>
+        <div class="pill multi" data-val="netsuite" data-cat="ERP" onclick="toggleEnv(this)">Oracle NetSuite</div>
+        <div class="pill multi" data-val="ms-dynamics" data-cat="ERP" onclick="toggleEnv(this)">Microsoft Dynamics</div>
+        <div class="pill multi" data-val="no-erp" data-cat="ERP" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+
+    <!-- Workflow / Prepress -->
+    <div class="env-group">
+      <div class="env-group-label">⚙️ Workflow Automation / Prepress</div>
+      <div class="pill-grid" style="margin-top:8px;">
+        <div class="pill multi" data-val="agfa-apogee" data-cat="Workflow" onclick="toggleEnv(this)">Agfa Apogee</div>
+        <div class="pill multi" data-val="esko-engine" data-cat="Workflow" onclick="toggleEnv(this)">Esko Automation Engine</div>
+        <div class="pill multi" data-val="kodak-prinergy" data-cat="Workflow" onclick="toggleEnv(this)">Kodak Prinergy</div>
+        <div class="pill multi" data-val="hd-prinect" data-cat="Workflow" onclick="toggleEnv(this)">Heidelberg Prinect</div>
+        <div class="pill multi" data-val="flux-existing" data-cat="Workflow" onclick="toggleEnv(this)">AccurioPro Flux</div>
+        <div class="pill multi" data-val="no-workflow" data-cat="Workflow" onclick="toggleEnv(this)">None / Manual</div>
+      </div>
+    </div>
+
+    <!-- Color Management -->
+    <div class="env-group">
+      <div class="env-group-label">🎨 Color Management</div>
+      <div class="pill-grid" style="margin-top:8px;">
+        <div class="pill multi" data-val="gmg-env" data-cat="ColorMgmt" onclick="toggleEnv(this)">GMG</div>
+        <div class="pill multi" data-val="apcm-existing" data-cat="ColorMgmt" onclick="toggleEnv(this)">AccurioPro Color Manager</div>
+        <div class="pill multi" data-val="no-colormgmt" data-cat="ColorMgmt" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+
+    <!-- Web-to-Print -->
+    <div class="env-group">
+      <div class="env-group-label">🌐 Web-to-Print / Approval Portal</div>
+      <div class="pill-grid" style="margin-top:8px;">
+        <div class="pill multi" data-val="webcenter" data-cat="W2P" onclick="toggleEnv(this)">WebCenter</div>
+        <div class="pill multi" data-val="printiq" data-cat="W2P" onclick="toggleEnv(this)">PrintIQ</div>
+        <div class="pill multi" data-val="custom-w2p" data-cat="W2P" onclick="toggleEnv(this)">Custom / In-house W2P</div>
+        <div class="pill multi" data-val="no-w2p" data-cat="W2P" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+
+    <!-- Finishing -->
+    <div class="env-group">
+      <div class="env-group-label">📦 Finishing Equipment</div>
+      <div class="pill-grid" style="margin-top:8px;">
+        <div class="pill multi" data-val="saddle-stitch" data-cat="Finishing" onclick="toggleEnv(this)">Saddle Stitcher</div>
+        <div class="pill multi" data-val="perfect-bind" data-cat="Finishing" onclick="toggleEnv(this)">Perfect Binder</div>
+        <div class="pill multi" data-val="cutter" data-cat="Finishing" onclick="toggleEnv(this)">Cutter / Guillotine</div>
+        <div class="pill multi" data-val="laminator" data-cat="Finishing" onclick="toggleEnv(this)">Laminator</div>
+        <div class="pill multi" data-val="folder" data-cat="Finishing" onclick="toggleEnv(this)">Folder / Inserter</div>
+        <div class="pill multi" data-val="no-finishing" data-cat="Finishing" onclick="toggleEnv(this)">None</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <label class="field-label" style="margin-bottom:12px;">Interested KM PP machines <span style="font-weight:400;color:var(--gray)">(select all that apply)</span></label>
+  <div class="card-grid cols-3" id="km-machines-grid">
+    <div class="sel-card multi" data-val="C5080" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖨</span>
+      <div class="card-label">AccurioPress C5080 / C5070</div>
+      <div class="card-desc">Next-gen mid-high color press with advanced automation support. Ideal for PFP, CRD, and growing commercial ops.</div>
+      <span class="info-chip">80/70 ppm · SRA3 · IC-613</span>
+    </div>
+    <div class="sel-card multi" data-val="C5065" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖨</span>
+      <div class="card-label">AccurioPrint C5065</div>
+      <div class="card-desc">Entry-level production color press. Best for PFP small–medium and CRD starter setups.</div>
+      <span class="info-chip">65 ppm · Color · IC-613</span>
+    </div>
+    <div class="sel-card multi" data-val="C14010" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖨</span>
+      <div class="card-label">AccurioPress C14010 / C12010</div>
+      <div class="card-desc">High-volume flagship color press. Built for commercial, large CRD and enterprise production environments.</div>
+      <span class="info-chip">140/120 ppm · IC-614</span>
+    </div>
+    <div class="sel-card multi" data-val="C14010S" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖨</span>
+      <div class="card-label">AccurioPress C14010S / C12010S</div>
+      <div class="card-desc">Super production variant of the C14010 series with enhanced automation and finishing capabilities.</div>
+      <span class="info-chip">140/120 ppm · Super · IC-614</span>
+    </div>
+    <div class="sel-card multi" data-val="C7100" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖨</span>
+      <div class="card-label">AccurioPress C7100 / C7090</div>
+      <div class="card-desc">Compact yet versatile color production press. Ideal for PFP mid-range, schools, and light commercial print.</div>
+      <span class="info-chip">100/90 ppm · Compact · IC-609</span>
+    </div>
+    <div class="sel-card multi" data-val="C4080" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖨</span>
+      <div class="card-label">AccurioPress C4080 / C4070</div>
+      <div class="card-desc">Mid-range color production press. Ideal for PFP, CRD and commercial mid-volume. Supports wide media range.</div>
+      <span class="info-chip">80/70 ppm · SRA3 · IC-609</span>
+    </div>
+    <div class="sel-card multi" data-val="C14000" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖨</span>
+      <div class="card-label">AccurioPress C14000 / C12000</div>
+      <div class="card-desc">Previous-gen high-speed, high-volume color press for commercial and large production environments.</div>
+      <span class="info-chip">140/120 ppm · IC-610</span>
+    </div>
+    <div class="sel-card multi" data-val="C84hc" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🎨</span>
+      <div class="card-label">AccurioPress C84hc</div>
+      <div class="card-desc">High Chroma toner press exceeding sRGB gamut. FOGRA certified. Ideal for photobooks, fashion, brand-critical work.</div>
+      <span class="info-chip">81 ppm · High Chroma · FOGRA</span>
+    </div>
+    <div class="sel-card multi" data-val="C83hc" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🎨</span>
+      <div class="card-label">AccurioPress C83hc</div>
+      <div class="card-desc">Compact High Chroma toner press. Wide gamut output for vivid color in a smaller footprint.</div>
+      <span class="info-chip">83 ppm · High Chroma</span>
+    </div>
+    <div class="sel-card multi" data-val="V180" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">🖤</span>
+      <div class="card-label">AccurioPress V180</div>
+      <div class="card-desc">High-speed monochrome production press for transactional and high-volume B&W output.</div>
+      <span class="info-chip">180 ppm · B&W</span>
+    </div>
+    <div class="sel-card multi" data-val="inkjet" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">💧</span>
+      <div class="card-label">AccurioJet / Inkjet</div>
+      <div class="card-desc">Production inkjet for high-speed, cost-effective book, direct mail, and transactional output.</div>
+      <span class="info-chip">Inkjet · High Speed</span>
+    </div>
+    <div class="sel-card multi" data-val="tbd" onclick="toggleCard(this,'km-machines')">
+      <span class="card-icon">❓</span>
+      <div class="card-label">TBD / Under Discussion</div>
+      <div class="card-desc">Machine selection not yet confirmed — recommend based on use case.</div>
+      <span class="info-chip">To be decided</span>
+    </div>
+  </div>
+
+  <p class="hint" id="hint-2">Please select operation size and at least one KM machine interest.</p>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(3)">Next: Challenges →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN 3 — Challenges
+══════════════════════════════════ -->
+<div class="screen" id="screen-3">
+  <div class="section-eyebrow">Step 3 of 4</div>
+  <div class="section-title">Current pain points &amp; challenges</div>
+  <div class="section-desc">Select all the challenges the customer is currently facing. The more you select, the more targeted the recommendation.</div>
+
+  <div id="challenges-container"></div>
+
+  <p class="hint" id="hint-3">Please select at least one challenge to continue.</p>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goTo(4)">Generate Recommendation →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN 4 — Results
+══════════════════════════════════ -->
+<div class="screen" id="screen-4">
+  <div id="results-content"></div>
+  <div class="action-row">
+    <button class="btn btn-ghost" onclick="goTo(3)">← Revise Challenges</button>
+    <button class="btn btn-navy" onclick="startOver()">↺ New Customer</button>
+    <button class="btn btn-mint" onclick="window.print()">🖨 Print / Save PDF</button>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+const state = {
+  custType: null,
+  custEmail: '',
+  salesRep: '',
+  custName: '',
+  size: null,
+  machines: [],
+  kmMachines: [],
+  designSoftware: [],
+  prepressWorkflow: [],
+  prepressOther: '',
+  currentEnv: {},
+  challenges: []
+};
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+let currentScreen = 1;
+
+function goTo(n) {
+  // Validate before advancing
+  if (n > currentScreen) {
+    if (currentScreen === 1) {
+      if (!state.custType) { document.getElementById('hint-1').classList.add('show'); return; }
+      state.custName = document.getElementById('customer-name').value || 'Customer';
+      state.custEmail = document.getElementById('customer-email').value || '';
+      state.salesRep = document.getElementById('sales-rep').value || '';
+      document.getElementById('hint-1').classList.remove('show');
+    }
+    if (currentScreen === 2) {
+      if (!state.size || state.kmMachines.length === 0) { document.getElementById('hint-2').classList.add('show'); return; }
+      document.getElementById('hint-2').classList.remove('show');
+    }
+    if (currentScreen === 3) {
+      if (state.challenges.length === 0) { document.getElementById('hint-3').classList.add('show'); return; }
+      document.getElementById('hint-3').classList.remove('show');
+      buildResults();
+    }
+  }
+
+  // Populate dynamic screens
+  if (n === 3) buildChallenges();
+
+  // Switch screens
+  document.getElementById('screen-' + currentScreen).classList.remove('active');
+  document.getElementById('screen-' + n).classList.add('active');
+  currentScreen = n;
+  updateProgress(n);
+  window.scrollTo(0, 0);
+}
+
+function updateProgress(n) {
+  for (let i = 1; i <= 4; i++) {
+    const si = document.getElementById('si-' + i);
+    si.classList.remove('active','done');
+    if (i < n) si.classList.add('done');
+    else if (i === n) si.classList.add('active');
+    if (i < 4) {
+      const sl = document.getElementById('sl-' + i);
+      sl.classList.toggle('done', i < n);
+    }
+  }
+}
+
+function startOver() {
+  state.custType = null; state.custName = ''; state.custEmail = ''; state.salesRep = ''; state.size = null;
+  state.machines = []; state.kmMachines = []; state.designSoftware = []; state.prepressWorkflow = []; state.prepressOther = ''; state.currentEnv = {}; state.challenges = [];
+  document.querySelectorAll('.sel-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('customer-name').value = '';
+  document.getElementById('customer-email').value = '';
+  document.getElementById('sales-rep').value = '';
+  const po = document.getElementById('prepress-other');
+  if (po) po.value = '';
+  goTo(1);
+}
+
+// ════════════════════════════════════════
+// SELECTION HELPERS
+// ════════════════════════════════════════
+function selectOne(el, key) {
+  // Find parent card-grid robustly
+  const grid = el.closest('.card-grid') || document.getElementById('cust-type-grid');
+  if (grid) grid.querySelectorAll('.sel-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  if (key === 'cust-type') state.custType = el.dataset.val;
+}
+
+function toggleCard(el, key) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const arr = key === 'km-machines' ? state.kmMachines : state.machines;
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+}
+
+function togglePillArr(el, arrKey) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const arr = state[arrKey];
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+}
+
+function toggleEnv(el) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const cat = el.dataset.cat;
+  if (!state.currentEnv[cat]) state.currentEnv[cat] = [];
+  const arr = state.currentEnv[cat];
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+}
+
+function togglePill(el, key) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const arr = state.machines;
+  const idx = arr.indexOf(val);
+  if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+}
+
+function selectSize(el) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.size = el.dataset.val;
+}
+
+function toggleChallenge(el) {
+  el.classList.toggle('selected');
+  const val = el.dataset.val;
+  const idx = state.challenges.indexOf(val);
+  if (idx === -1) state.challenges.push(val); else state.challenges.splice(idx, 1);
+}
+
+// ════════════════════════════════════════
+// CHALLENGES DATA
+// ════════════════════════════════════════
+const CHALLENGE_GROUPS = {
+  color: {
+    label: '🎨 Color Management',
+    items: [
+      { val:'color-inconsistency', label:'Color inconsistency across devices/shifts' },
+      { val:'no-icc', label:'No ICC profiles or color standards in place' },
+      { val:'brand-color', label:'Client brand color matching required' },
+      { val:'pantone', label:'Pantone / spot color matching demands' },
+      { val:'proofing', label:'No soft proofing or color approval process' },
+      { val:'color-expertise', label:'Limited color management knowledge on team' },
+      { val:'g7-fogra', label:'G7 / FOGRA compliance required by clients' },
+      { val:'reprints', label:'High reprint rate due to color errors' },
+    ]
+  },
+  workflow: {
+    label: '⚙️ Workflow & Automation',
+    items: [
+      { val:'manual-prepress', label:'Manual prepress — operator fixing files manually' },
+      { val:'no-preflight', label:'No automated preflight / file validation' },
+      { val:'job-intake', label:'Job intake via email, WhatsApp, or walk-in only' },
+      { val:'no-routing', label:'No automated job routing between devices' },
+      { val:'no-tracking', label:'No job status tracking or visibility' },
+      { val:'bottlenecks', label:'Production bottlenecks and missed deadlines' },
+      { val:'multi-device', label:'Multiple devices with no central management' },
+      { val:'hot-folders', label:'No hot folder automation' },
+      { val:'imposition', label:'Manual imposition wasting paper' },
+    ]
+  },
+  business: {
+    label: '💼 Business & Client',
+    items: [
+      { val:'client-portal', label:'Clients want online job submission / B2B portal' },
+      { val:'spend-visibility', label:'No visibility over print spend / departmental billing' },
+      { val:'seasonal-peak', label:'Seasonal volume peaks overwhelm the team' },
+      { val:'pricing', label:'Difficulty pricing short-run jobs profitably' },
+      { val:'mis-integration', label:'Need MIS / ERP / JDF integration' },
+      { val:'sla', label:'Struggling to meet SLAs / tight turnarounds' },
+      { val:'secure-jobs', label:'Need secure/access-controlled job submission' },
+      { val:'offset-to-digital', label:'Transitioning offset jobs to digital production' },
+      { val:'hybrid', label:'Running hybrid offset + digital workflow' },
+    ]
+  }
+};
+
+function buildChallenges() {
+  state.challenges = [];
+  const container = document.getElementById('challenges-container');
+  container.innerHTML = '';
+  for (const [groupKey, group] of Object.entries(CHALLENGE_GROUPS)) {
+    const section = document.createElement('div');
+    section.style.marginBottom = '24px';
+    section.innerHTML = `<div class="rec-section-title" style="margin-bottom:12px;">${group.label}</div>`;
+    const grid = document.createElement('div');
+    grid.className = 'pill-grid';
+    group.items.forEach(item => {
+      const pill = document.createElement('div');
+      pill.className = 'pill multi';
+      pill.dataset.val = item.val;
+      pill.textContent = item.label;
+      pill.onclick = () => toggleChallenge(pill);
+      grid.appendChild(pill);
+    });
+    section.appendChild(grid);
+    container.appendChild(section);
+  }
+}
+
+// ════════════════════════════════════════
+// RECOMMENDATION ENGINE
+// ════════════════════════════════════════
+function computeRecommendation() {
+  const { custType, size, challenges, kmMachines } = state;
+
+  // Flux tier logic
+  let fluxTier = 'Essential';
+  const needsUltimate = challenges.some(c => ['client-portal','mis-integration','hybrid','offset-to-digital','spend-visibility','secure-jobs'].includes(c));
+  const needsPremium = challenges.some(c => ['client-portal','sla','seasonal-peak','pricing'].includes(c));
+  const hasClientFacing = challenges.includes('client-portal');
+  const hasMIS = challenges.includes('mis-integration');
+
+  if (custType === 'Schools') fluxTier = 'Ultimate';
+  else if (custType === 'Commercial' && size === 'Big') fluxTier = 'Ultimate';
+  else if (custType === 'Commercial' && size === 'Medium') fluxTier = 'Premium';
+  else if (custType === 'Offset') fluxTier = hasMIS ? 'Ultimate' : 'Premium';
+  else if (needsUltimate) fluxTier = 'Ultimate';
+  else if (needsPremium || hasClientFacing) fluxTier = 'Premium';
+  else fluxTier = 'Essential';
+
+  // APCM tier
+  const needsSuite = challenges.some(c => ['brand-color','pantone','proofing','g7-fogra','color-expertise'].includes(c)) || custType === 'CRD' || (custType === 'Commercial' && size !== 'Small');
+  const apcmTier = needsSuite ? 'Suite' : 'Essential';
+
+  // CloudEye
+  const needsCloudEye = (custType === 'Commercial' && size === 'Big') || challenges.some(c => ['multi-device','no-tracking'].includes(c) && size === 'Big');
+
+  // Key selling points
+  const sellingPoints = [];
+  if (challenges.includes('manual-prepress') || challenges.includes('no-preflight')) sellingPoints.push('Automated preflight & prepress reduces operator time and eliminates costly reprints');
+  if (challenges.includes('job-intake')) sellingPoints.push(fluxTier === 'Essential' ? 'Hot folders and job ticketing replace manual email intake' : 'B2B online portal gives clients 24/7 self-service job submission');
+  if (challenges.includes('multi-device') || challenges.includes('no-routing')) sellingPoints.push('Central dashboard manages all devices with intelligent job routing');
+  if (challenges.includes('color-inconsistency') || challenges.includes('reprints')) sellingPoints.push('APCM eliminates color inconsistency — directly reducing reprint costs and waste');
+  if (challenges.includes('brand-color') || challenges.includes('pantone')) sellingPoints.push('APCM Suite ensures brand color accuracy and Pantone matching every time');
+  if (challenges.includes('spend-visibility') || challenges.includes('secure-jobs')) sellingPoints.push('Departmental accounts and access controls give full print spend visibility');
+  if (challenges.includes('mis-integration') || challenges.includes('hybrid')) sellingPoints.push('Flux Ultimate connects MIS/ERP via JDF/JMF for fully automated end-to-end production');
+  if (challenges.includes('offset-to-digital')) sellingPoints.push('Seamless hybrid workflow bridges offset and digital production in one system');
+
+  // Workflow steps
+  const workflowSteps = buildWorkflowSteps(custType, fluxTier, apcmTier, kmMachines);
+
+  // Upsell path
+  const allNodes = ['APCM Essential','APCM Suite','Flux Essential','Flux Premium','Flux Ultimate'];
+  const currentNodes = [`APCM ${apcmTier}`, `Flux ${fluxTier}`];
+  if (needsCloudEye) currentNodes.push('CloudEye');
+
+  return { fluxTier, apcmTier, needsCloudEye, sellingPoints, workflowSteps, currentNodes };
+}
+
+function buildWorkflowSteps(custType, fluxTier, apcmTier, machines) {
+  const steps = [];
+
+  // Job intake
+  if (fluxTier === 'Essential') {
+    steps.push({ icon:'📁', label:'Job Intake', sub:'Hot Folders / Email', color:'gray', product:'Flux Essential' });
+  } else if (fluxTier === 'Premium') {
+    steps.push({ icon:'🌐', label:'Client Portal', sub:'Job Submission', color:'teal', product:'Flux Premium' });
+  } else {
+    steps.push({ icon:'🛒', label:'Online Storefront', sub:'B2B Portal', color:'teal', product:'Flux Ultimate' });
+  }
+
+  // Preflight
+  steps.push({ icon:'✅', label:'Preflight', sub:'Auto File Check', color:'navy', product:'Flux ' + fluxTier });
+
+  // Color management
+  steps.push({ icon:'🎨', label:'Color Mgmt', sub:`APCM ${apcmTier}`, color:'mint', product:`APCM ${apcmTier}` });
+
+  // Imposition
+  steps.push({ icon:'📐', label:'Imposition', sub:'Auto Layout', color:'navy', product:'Flux ' + fluxTier });
+
+  // Job routing
+  if (fluxTier !== 'Essential') {
+    steps.push({ icon:'🔀', label:'Smart Routing', sub:'Rules-based', color:'teal', product:'Flux ' + fluxTier });
+  }
+
+  // Print
+  const machineLabel = machines.includes('C84hc') ? 'AccurioPress\nC84hc' : machines.includes('C14000') ? 'AccurioPress\nC14000' : machines.includes('C4080') ? 'AccurioPress\nC4080' : 'AccurioPress';
+  steps.push({ icon:'🖨', label:'Production Print', sub: machineLabel.replace('\n',' '), color:'amber', product:'KM AccurioPress' });
+
+  // Finishing
+  steps.push({ icon:'📦', label:'Finishing', sub:'Bindery / Output', color:'gray', product:'Inline/Offline' });
+
+  // MIS (for ultimate)
+  if (fluxTier === 'Ultimate') {
+    steps.push({ icon:'📊', label:'MIS / Analytics', sub:'JDF/JMF', color:'purple', product:'Flux Ultimate' });
+  }
+
+  return steps;
+}
+
+// ════════════════════════════════════════
+// BUILD RESULTS HTML
+// ════════════════════════════════════════
+const CUST_LABELS = {
+  PFP: 'Print for Pay (PFP)',
+  CRD: 'Corporate Reprographics (CRD)',
+  Commercial: 'Commercial Printer',
+  Schools: 'Schools & Universities',
+  Government: 'Government Institution',
+  Offset: 'Commercial Offset Printer'
+};
+
+const FLUX_FEATURES = {
+  Essential: [
+    'Automated preflight & file validation',
+    'Hot folder automation & job ticketing',
+    'Auto imposition & PDF normalization',
+    'Central device management dashboard',
+    'Job routing across multiple printers',
+    'Device utilization visibility'
+  ],
+  Premium: [
+    'All Flux Essential features',
+    'Client-facing B2B job submission portal',
+    'Priority job routing & scheduling',
+    'Client proofing & approval workflow',
+    'Advanced automation rules engine',
+    'Multi-location job management'
+  ],
+  Ultimate: [
+    'All Flux Premium features',
+    'Online print storefront (B2B e-commerce)',
+    'JDF/JMF/MIS/ERP integration',
+    'Departmental accounts & chargeback billing',
+    'Access-controlled secure job submission',
+    'Full production analytics & SLA tracking'
+  ]
+};
+
+const APCM_FEATURES = {
+  Essential: [
+    'ICC profile creation & management',
+    'Auto color correction across devices',
+    'Basic Pantone color matching',
+    'Easy deployment — no heavy IT required',
+    'Color consistency for all print jobs',
+    'Supports multiple KM devices'
+  ],
+  Suite: [
+    'All APCM Essential features',
+    'Advanced multi-device color management',
+    'Soft proofing & color approval workflow',
+    'Full Pantone / brand color accuracy',
+    'G7 / FOGRA compliance readiness',
+    'CloudEye integration for remote monitoring'
+  ]
+};
+
+const MACHINE_DETAILS = {
+  C5080:   { name:'AccurioPress C5080 / C5070', desc:'Next-gen mid-high color production press at 80/70 ppm with advanced automation support. SRA3 media. IC-613 controller.', tags:['80/70 ppm','SRA3','IC-613'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c5080-c5070/' },
+  C5065:   { name:'AccurioPrint C5065', desc:'Entry-level production color press at 65 ppm. Compact footprint with strong automation features. IC-613 controller.', tags:['65 ppm','Compact','IC-613'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accurioprint-c5065/' },
+  C14010:  { name:'AccurioPress C14010 / C12010', desc:'Flagship high-volume color press at 140/120 ppm. Built for commercial, large CRD and enterprise. IC-614 controller.', tags:['140/120 ppm','High Volume','IC-614'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c14010-c12010/' },
+  C14010S: { name:'AccurioPress C14010S / C12010S', desc:'Super variant of the C14010 series with enhanced automation units and finishing integration.', tags:['140/120 ppm','Super','IC-614'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c14010-c12010/' },
+  C7100:   { name:'AccurioPress C7100 / C7090', desc:'Compact versatile color production press at 100/90 ppm. Ideal for PFP mid-range, schools, and light commercial. IC-609 controller.', tags:['100/90 ppm','Compact','IC-609'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c7100-c7090/' },
+  C4080:   { name:'AccurioPress C4080 / C4070', desc:'Mid-range color press at 80/70 ppm. Ideal for PFP, CRD, commercial mid-volume. Wide media support. IC-609 controller.', tags:['80/70 ppm','SRA3','IC-609'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c4080-c4070/' },
+  C14000:  { name:'AccurioPress C14000 / C12000', desc:'High-speed, high-volume color press at 140/120 ppm. Best for large commercial and enterprise production environments.', tags:['140/120 ppm','High Volume','IC-610'], url:'https://www.konicaminolta.com/global-en/business/production-print/' },
+  C84hc:   { name:'AccurioPress C84hc', desc:'High Chroma toner press with extended color gamut exceeding sRGB. FOGRA certified. Ideal for photobooks, fashion, brand-critical work.', tags:['81 ppm','High Chroma','FOGRA Certified'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c84hc/' },
+  C83hc:   { name:'AccurioPress C83hc', desc:'Compact High Chroma toner press with wide gamut output for vivid color in a smaller footprint.', tags:['83 ppm','High Chroma','Compact'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-c83hc/' },
+  V180:    { name:'AccurioPress V180', desc:'High-speed mono production press at 180 ppm. Ideal for transactional, book, and high-volume B&W output.', tags:['180 ppm','B&W','Transactional'], url:'https://www.konicaminolta.com/global-en/business/production-print/digital-printing-systems/accuriopress-v180/' },
+  inkjet:  { name:'AccurioJet Series', desc:'Production inkjet for high-speed, cost-effective output. Ideal for books, direct mail, and transactional applications.', tags:['Inkjet','High Speed','Books'], url:'https://www.konicaminolta.com/global-en/business/production-print/inkjet/' },
+  tbd:     { name:'KM AccurioPress (TBD)', desc:'Machine selection to be confirmed based on volume, application, and budget requirements.', tags:['To Be Confirmed'], url:'https://www.konicaminolta.com/global-en/business/production-print/' }
+};
+
+const TAG_COLORS = ['teal','mint','navy'];
+
+function buildResults() {
+  const rec = computeRecommendation();
+  const { fluxTier, apcmTier, needsCloudEye, sellingPoints, workflowSteps, currentNodes } = rec;
+  const custLabel = CUST_LABELS[state.custType] || state.custType;
+
+  // Challenge labels
+  const allChallItems = Object.values(CHALLENGE_GROUPS).flatMap(g => g.items);
+  const challLabels = state.challenges.map(v => allChallItems.find(i => i.val === v)?.label || v);
+
+  // Current environment summary
+  const ENV_LABELS = {
+    MIS: '📊 MIS', ERP: '🏗 ERP', Workflow: '⚙️ Workflow', ColorMgmt: '🎨 Color Mgmt', W2P: '🌐 Web-to-Print', Finishing: '📦 Finishing'
+  };
+  const ENV_NAMES = {
+    'efi-pace':'EFI Pace','printviz':'PrintVis','tharstern':'Tharstern','cerm':'CERM','no-mis':'None',
+    'sap':'SAP','netsuite':'Oracle NetSuite','ms-dynamics':'Microsoft Dynamics','no-erp':'None',
+    'agfa-apogee':'Agfa Apogee','esko-engine':'Esko Automation Engine','kodak-prinergy':'Kodak Prinergy','hd-prinect':'Heidelberg Prinect','flux-existing':'AccurioPro Flux','no-workflow':'None',
+    'gmg-env':'GMG','apcm-existing':'AccurioPro Color Manager','no-colormgmt':'None',
+    'webcenter':'WebCenter','printiq':'PrintIQ','custom-w2p':'Custom W2P','no-w2p':'None',
+    'saddle-stitch':'Saddle Stitcher','perfect-bind':'Perfect Binder','cutter':'Cutter','laminator':'Laminator','folder':'Folder/Inserter','no-finishing':'None'
+  };
+  const DESIGN_NAMES = {
+    'indesign':'Adobe InDesign','photoshop':'Adobe Photoshop','illustrator':'Adobe Illustrator','acrobat':'Adobe Acrobat',
+    'coreldraw':'CorelDRAW','msword':'MS Word','msexcel':'MS Excel','msppt':'MS PowerPoint'
+  };
+  const PREPRESS_NAMES = {
+    'prinergy':'Kodak Prinergy','prinect':'Heidelberg Prinect','apogee':'Agfa Apogee','esko-ae':'Esko Automation Engine',
+    'esko-dp':'Esko DeskPack','artpro':'ArtPro+','gmg-color':'GMG Color Server','gmg-open':'GMG OpenColor','gmg-proof':'GMG ColorProof','none-prepress':'None'
+  };
+
+  // Workflow diagram HTML
+  let wfHTML = '';
+  workflowSteps.forEach((step, i) => {
+    wfHTML += `<div class="wf-step">
+      <div class="wf-box ${step.color}">
+        <span class="wf-icon">${step.icon}</span>
+        ${step.label}
+        <div class="wf-product-tag">${step.product}</div>
+      </div>
+      <div class="wf-label">${step.sub}</div>
+    </div>`;
+    if (i < workflowSteps.length - 1) wfHTML += `<div class="wf-arrow">›</div>`;
+  });
+
+  // Machine cards HTML
+  let machineHTML = '';
+  let qrTargets = [];
+  if (state.kmMachines.length > 0 && !state.kmMachines.includes('tbd')) {
+    state.kmMachines.forEach(m => {
+      const d = MACHINE_DETAILS[m];
+      if (!d) return;
+      const tags = d.tags.map((t,i) => `<span class="tag tag-${TAG_COLORS[i%3]}">${t}</span>`).join('');
+      const qrId = `qr-${m}`;
+      qrTargets.push({ id: qrId, url: d.url || 'https://www.konicaminolta.com/global-en/business/production-print/' });
+      machineHTML += `
+        <div class="machine-card">
+          <div class="machine-badge">KM<br>AccurioPress</div>
+          <div style="flex:1">
+            <div class="machine-name">${d.name}</div>
+            <div class="machine-desc">${d.desc}</div>
+            <div class="machine-tags">${tags}</div>
+            <div style="margin-top:8px;font-size:11px;color:var(--teal);">🔗 <a href="${d.url}" target="_blank" style="color:var(--teal);text-decoration:none;">${d.url}</a></div>
+          </div>
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <div id="${qrId}" style="width:72px;height:72px;"></div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;">Scan for<br>product page</div>
+          </div>
+        </div>`;
+    });
+  } else {
+    machineHTML = `<div class="machine-card">
+      <div class="machine-badge">KM<br>AccurioPress</div>
+      <div>
+        <div class="machine-name">Machine to be confirmed</div>
+        <div class="machine-desc">Based on the customer profile, we recommend exploring the AccurioPress range. Machine selection should be finalized after volume and application assessment.</div>
+        <div class="machine-tags"><span class="tag tag-navy">Pending Assessment</span></div>
+        <div style="margin-top:8px;font-size:11px;color:var(--teal);">🔗 <a href="https://www.konicaminolta.com/global-en/business/production-print/" target="_blank" style="color:var(--teal);text-decoration:none;">konicaminolta.com/global-en/business/production-print</a></div>
+      </div>
+    </div>`;
+  }
+
+  // Upsell path
+  const upsellNodes = ['APCM Essential','APCM Suite','Flux Essential','Flux Premium','Flux Ultimate'];
+  if (needsCloudEye) upsellNodes.push('CloudEye');
+  const upsellHTML = upsellNodes.map(n => {
+    const isCurrent = currentNodes.includes(n);
+    return `<div class="upsell-node ${isCurrent ? 'current' : ''}">${n}</div>${n !== upsellNodes[upsellNodes.length-1] ? '<div class="upsell-arrow">→</div>' : ''}`;
+  }).join('');
+
+  // Selling points
+  const spHTML = sellingPoints.length > 0 ? sellingPoints.map(sp =>
+    `<li style="margin-bottom:6px;padding-left:20px;position:relative;font-size:13px;line-height:1.5;color:var(--text);">
+      <span style="position:absolute;left:0;color:var(--mint);font-weight:700;">✓</span>${sp}
+    </li>`).join('') : '<li style="color:var(--gray);font-size:13px;">Solutions are matched to operation profile.</li>';
+
+  const html = `
+    <!-- Header -->
+    <div class="result-header" style="display:flex;gap:24px;align-items:flex-start;">
+      <div style="flex:1;">
+        <div class="result-header-eyebrow">Solution Recommendation</div>
+        <div class="result-header-title">${state.custName}</div>
+        <div class="result-header-sub">Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px;">
+          ${state.custEmail ? '<div style="font-size:12px;color:rgba(255,255,255,0.7);">\u{1F4E7} ' + state.custEmail + '</div>' : ''}
+          ${state.salesRep ? '<div style="font-size:12px;color:rgba(255,255,255,0.7);">\u{1F464} Sales Rep: ' + state.salesRep + '</div>' : ''}
+        </div>
+        <div class="result-header-meta" style="margin-top:14px;">
+          <span class="meta-chip">📋 ${custLabel}</span>
+          <span class="meta-chip">📏 ${state.size}</span>
+          <span class="meta-chip">⚙️ Flux ${fluxTier}</span>
+          <span class="meta-chip">🎨 APCM ${apcmTier}</span>
+          ${needsCloudEye ? '<span class="meta-chip">👁 CloudEye</span>' : ''}
+        </div>
+      </div>
+      <div style="flex-shrink:0;text-align:center;">
+        <div id="qr-header" style="width:90px;height:90px;background:white;border-radius:8px;padding:4px;"></div>
+        <div style="font-size:9px;color:rgba(255,255,255,0.5);margin-top:4px;">KM Production Print</div>
+      </div>
+    </div>
+
+    <!-- Current Environment Summary -->
+    ${(Object.keys(state.currentEnv).length > 0 || state.designSoftware.length > 0 || state.prepressWorkflow.length > 0) ? `
+    <div style="background:var(--white);border-radius:var(--radius);padding:22px 26px;box-shadow:var(--shadow);margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:14px;">🖥 Current Environment Profile</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        ${Object.entries(state.currentEnv).filter(([,v])=>v.length>0).map(([cat,vals])=>{
+          const filtered = vals.filter(v=>!v.startsWith('no-'));
+          if(!filtered.length) return '';
+          return '<div style="background:var(--off-white);border-radius:8px;padding:12px;"><div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px;">' + (ENV_LABELS[cat]||cat) + '</div>' +
+            filtered.map(v=>'<div style="font-size:12px;color:var(--text);padding:2px 0;">• ' + (ENV_NAMES[v]||v) + '</div>').join('') + '</div>';
+        }).join('')}
+        ${state.designSoftware.length ? '<div style="background:var(--off-white);border-radius:8px;padding:12px;"><div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px;">🎨 Design Software</div>' + state.designSoftware.map(v=>'<div style="font-size:12px;color:var(--text);padding:2px 0;">• ' + (DESIGN_NAMES[v]||v) + '</div>').join('') + '</div>' : ''}
+        ${state.prepressWorkflow.filter(v=>v!=='none-prepress').length ? '<div style="background:var(--off-white);border-radius:8px;padding:12px;"><div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px;">⚙️ Prepress Software</div>' + state.prepressWorkflow.filter(v=>v!=='none-prepress').map(v=>'<div style="font-size:12px;color:var(--text);padding:2px 0;">• ' + (PREPRESS_NAMES[v]||v) + '</div>').join('') + (state.prepressOther ? '<div style="font-size:12px;color:var(--text);padding:2px 0;">• ' + state.prepressOther + '</div>' : '') + '</div>' : ''}
+      </div>
+    </div>` : ''}
+
+    <!-- Challenges identified -->
+    <div class="challenges-bar">
+      <div class="challenges-bar-title">⚠️ Identified Challenges (${challLabels.length})</div>
+      <div class="challenges-list">
+        ${challLabels.map(l => `<span class="challenge-pill">${l}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- Solution recommendations -->
+    <div class="rec-section-title">Recommended Solutions</div>
+    <div class="rec-grid">
+      <div class="rec-card">
+        <div class="rec-card-header">
+          <div class="rec-icon workflow">⚙️</div>
+          <div>
+            <div class="rec-product-name">AccurioPro Flux ${fluxTier}</div>
+            <div class="rec-product-type">Digital Production Workflow</div>
+          </div>
+        </div>
+        <ul class="rec-features">
+          ${FLUX_FEATURES[fluxTier].map(f => `<li>${f}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="rec-card color">
+        <div class="rec-card-header">
+          <div class="rec-icon color-bg">🎨</div>
+          <div>
+            <div class="rec-product-name">AccurioPro Color Manager ${apcmTier}</div>
+            <div class="rec-product-type">Color Management</div>
+          </div>
+        </div>
+        <ul class="rec-features">
+          ${APCM_FEATURES[apcmTier].map(f => `<li>${f}</li>`).join('')}
+        </ul>
+      </div>
+    </div>
+
+    ${needsCloudEye ? `
+    <div style="background:rgba(13,31,60,0.05);border-radius:10px;padding:18px 22px;margin-bottom:24px;border:1px solid rgba(13,31,60,0.1);">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;">👁 CloudEye — Remote Color Monitoring</div>
+      <div style="font-size:12.5px;color:var(--gray);line-height:1.6;">Real-time remote color monitoring across all devices and shifts. Essential for large operations where a color expert cannot be physically present at every press at all times. Provides instant alerts on color deviation and centralized reporting.</div>
+    </div>` : ''}
+
+    <!-- Machines -->
+    <div class="rec-section-title">Recommended KM Machine(s)</div>
+    ${machineHTML}
+
+    <!-- Workflow Diagram -->
+    <div class="workflow-section">
+      <div class="workflow-title">📊 Recommended Production Workflow</div>
+      <div class="workflow-diagram">${wfHTML}</div>
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--gray);">
+          <span style="display:inline-block;width:10px;height:10px;background:var(--teal);border-radius:2px;margin-right:4px;"></span>Flux ${fluxTier}
+        </span>
+        <span style="font-size:11px;color:var(--gray);">
+          <span style="display:inline-block;width:10px;height:10px;background:var(--mint);border-radius:2px;margin-right:4px;"></span>APCM ${apcmTier}
+        </span>
+        <span style="font-size:11px;color:var(--gray);">
+          <span style="display:inline-block;width:10px;height:10px;background:var(--amber);border-radius:2px;margin-right:4px;"></span>KM AccurioPress
+        </span>
+      </div>
+    </div>
+
+    <!-- Why this solution -->
+    <div style="background:var(--white);border-radius:var(--radius);padding:24px 28px;box-shadow:var(--shadow);margin-bottom:24px;">
+      <div class="rec-section-title">Why This Solution Solves Their Problems</div>
+      <ul style="list-style:none;">${spHTML}</ul>
+    </div>
+
+    <!-- Upsell path -->
+    <div class="upsell-card">
+      <div class="upsell-title">Growth Path & Upsell Opportunity</div>
+      <div class="upsell-path">${upsellHTML}</div>
+      <div style="margin-top:14px;font-size:12px;color:var(--muted);line-height:1.6;">
+        Start with the highlighted solution. As the customer grows or requirements expand, the solution scales with them — no rip-and-replace, just an upgrade.
+      </div>
+    </div>
+  `;
+
+  document.getElementById('results-content').innerHTML = html;
+
+  // Generate QR codes after DOM update
+  setTimeout(() => {
+    // Header QR — links to KM production print main page
+    try {
+      new QRCode(document.getElementById('qr-header'), {
+        text: 'https://www.konicaminolta.com/global-en/business/production-print/',
+        width: 90, height: 90,
+        colorDark: '#0D1F3C', colorLight: '#FFFFFF',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) {}
+    // Machine QR codes
+    qrTargets.forEach(({ id, url }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      try {
+        new QRCode(el, {
+          text: url,
+          width: 72, height: 72,
+          colorDark: '#0D1F3C', colorLight: '#FFFFFF',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch(e) {}
+    });
+  }, 100);
+}
+</script>
+</body>
+</html>
